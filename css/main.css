@@ -188,7 +188,7 @@ body {
   font-family: 'Lato', "PingFang SC", "Microsoft YaHei", sans-serif;
   font-size: 14px;
   line-height: 2;
-  color: #0684bd;
+  color: #555;
   background: #f5f7f9;
 }
 @media (max-width: 767px) {
@@ -278,15 +278,15 @@ p {
   margin: 0 0 20px 0;
 }
 a {
-  color: #0684bd;
+  color: #555;
   text-decoration: none;
   outline: none;
   border-bottom: 1px solid #999;
   word-wrap: break-word;
 }
 a:hover {
-  color: #0684bd;
-  border-bottom-color: #0684bd;
+  color: #222;
+  border-bottom-color: #222;
 }
 blockquote {
   margin: 0;
@@ -307,7 +307,7 @@ hr {
 }
 blockquote {
   padding: 0 15px;
-  color: #666;
+  color: #666 z;
   border-left: 4px solid #ddd;
 }
 blockquote cite::before {
@@ -498,7 +498,7 @@ code {
 code {
   padding: 2px 4px;
   word-wrap: break-word;
-  color: #0684bd;
+  color: #555;
   background: #eee;
   border-radius: 3px;
   font-size: 14px;
@@ -918,7 +918,7 @@ pre .javascript .function {
 }
 .post-body .tabs ul.nav-tabs li.tab.active a {
   cursor: default;
-  color: #0684bd;
+  color: #555;
 }
 .post-body .tabs .tab-content {
   background-color: #fff;
@@ -937,9 +937,9 @@ pre .javascript .function {
   display: inline-block;
   padding: 0 20px;
   font-size: 14px;
-  color: #0684bd;
+  color: #555;
   background: #fff;
-  border: 2px solid #0684bd;
+  border: 2px solid #555;
   text-decoration: none;
   border-radius: 2px;
   transition-property: background-color;
@@ -949,7 +949,7 @@ pre .javascript .function {
   line-height: 2;
 }
 .btn:hover {
-  border-color: #0684bd;
+  border-color: #222;
   color: #fff;
   background: #222;
 }
@@ -964,7 +964,7 @@ pre .javascript .function {
   display: block;
   width: 22px;
   height: 2px;
-  background: #0684bd;
+  background: #555;
   border-radius: 1px;
 }
 .btn-bar+.btn-bar {
@@ -1008,7 +1008,7 @@ pre .javascript .function {
 .pagination .prev:hover,
 .pagination .next:hover,
 .pagination .page-number:hover {
-  border-top-color: #0684bd;
+  border-top-color: #222;
 }
 .pagination .space {
   padding: 0;
@@ -1040,7 +1040,7 @@ pre .javascript .function {
   .pagination .prev:hover,
   .pagination .next:hover,
   .pagination .page-number:hover {
-    border-bottom-color: #0684bd;
+    border-bottom-color: #222;
   }
 }
 .comments {
@@ -1061,7 +1061,7 @@ pre .javascript .function {
   z-index: 1050;
   padding: 0 6px;
   width: 24px;
-  background: #0684bd;
+  background: #222;
   font-size: 12px;
   opacity: 0.6;
   color: #fff;
@@ -1094,7 +1094,7 @@ pre .javascript .function {
 }
 .headband {
   height: 3px;
-  background: #0684bd;
+  background: #87cefa;
 }
 .site-meta {
   margin: 0;
@@ -1110,7 +1110,7 @@ pre .javascript .function {
   display: inline-block;
   padding: 0 40px;
   color: #fff;
-  background: #0684bd;
+  background: #222;
   border-bottom: none;
 }
 .brand:hover {
@@ -1208,7 +1208,7 @@ pre .javascript .function {
 }
 .menu .menu-item a:hover,
 .menu-item-active a {
-  border-bottom-color: #0684bd;
+  border-bottom-color: #222;
 }
 .menu .menu-item .fa {
   margin-right: 5px;
@@ -1419,7 +1419,7 @@ pre .javascript .function {
   transition-property: background;
 }
 .posts-collapse .post-header:hover {
-  border-bottom-color: #666;
+  border-bottom-color: #666 z;
 }
 .posts-collapse .post-header:hover::before {
   background: #222;
@@ -1444,7 +1444,7 @@ pre .javascript .function {
   opacity: 0.6;
 }
 .posts-collapse .post-title a {
-  color: #666;
+  color: #666 z;
   border-bottom: none;
 }
 .page-home .post-type-quote .post-header,
@@ -1577,11 +1577,11 @@ pre .javascript .function {
   display: block;
   line-height: 25px;
   font-size: 14px;
-  color: #0684bd;
+  color: #555;
   border-bottom: none;
 }
 .post-nav-item a:hover {
-  color: #0684bd;
+  color: #222;
   border-bottom: none;
 }
 .post-nav-item a:active {
@@ -1826,7 +1826,7 @@ pre .javascript .function {
   width: 4px;
   height: 4px;
   border-radius: 50%;
-  background: #ffe4ff;
+  background: #613d5e;
 }
 .links-of-blogroll {
   font-size: 13px;
@@ -1861,7 +1861,7 @@ pre .javascript .function {
   cursor: pointer;
   border-bottom: 1px solid transparent;
   font-size: 14px;
-  color: #0684bd;
+  color: #555;
 }
 .sidebar-nav li:hover {
   color: #fc6423;
@@ -1887,7 +1887,7 @@ pre .javascript .function {
 }
 .post-toc-empty {
   font-size: 14px;
-  color: #666;
+  color: #666 z;
 }
 .post-toc-wrap {
   overflow: hidden;
@@ -1910,7 +1910,7 @@ pre .javascript .function {
   transition-timing-function: ease-in-out;
   transition-delay: 0s;
   transition-property: all;
-  color: #666;
+  color: #666 z;
   border-bottom-color: #ccc;
 }
 .post-toc ol a:hover {
@@ -2654,7 +2654,7 @@ ul.breadcrumb li+li:last-child {
 .site-meta {
   padding: 20px 0;
   color: #fff;
-  background: #222;
+  background: #87cefa;
 }
 @media (min-width: 768px) and (max-width: 991px) {
   .site-meta {
@@ -2801,7 +2801,7 @@ ul.breadcrumb li+li:last-child {
 .sidebar-inner {
   box-sizing: border-box;
   width: 240px;
-  color: #0684bd;
+  color: #555;
   background: #fff;
   box-shadow: initial;
   border-radius: initial;
