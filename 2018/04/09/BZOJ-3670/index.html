@@ -102,24 +102,25 @@
 
 
 
-  <meta name="description" content="123456789#include &amp;lt;cstdio&amp;gt;int main()&amp;#123;	int x, y;	scanf(&quot;%d%d&quot;, &amp;amp;x, &amp;amp;y);	printf(&quot;%d\n&quot;, x + y);	return 0;&amp;#125;">
+  <meta name="description" content="题意  我现在希望求出一个更强大num数组一一对于字符串S的前i个字符构成的子串，既是它的后缀同时又是它的前缀，并且该后缀与该前缀不重叠，将这种字符串的数量记作num[i]。  然后输出$ _ {i = 1} ^ L (num[i] + 1) $">
+<meta name="keywords" content="KMP">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Hello World">
-<meta property="og:url" content="http://x.phoenixgs.cn/Solutions/2016/05/29/Hello-World/index.html">
+<meta property="og:title" content="BZOJ 3670 [Noi2014]动物园">
+<meta property="og:url" content="http://x.phoenixgs.cn/Solutions/2018/04/09/BZOJ-3670/index.html">
 <meta property="og:site_name" content="Solutions">
-<meta property="og:description" content="123456789#include &amp;lt;cstdio&amp;gt;int main()&amp;#123;	int x, y;	scanf(&quot;%d%d&quot;, &amp;amp;x, &amp;amp;y);	printf(&quot;%d\n&quot;, x + y);	return 0;&amp;#125;">
+<meta property="og:description" content="题意  我现在希望求出一个更强大num数组一一对于字符串S的前i个字符构成的子串，既是它的后缀同时又是它的前缀，并且该后缀与该前缀不重叠，将这种字符串的数量记作num[i]。  然后输出$ _ {i = 1} ^ L (num[i] + 1) $">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2018-04-09T16:28:03.783Z">
+<meta property="og:updated_time" content="2018-04-10T01:21:38.016Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Hello World">
-<meta name="twitter:description" content="123456789#include &amp;lt;cstdio&amp;gt;int main()&amp;#123;	int x, y;	scanf(&quot;%d%d&quot;, &amp;amp;x, &amp;amp;y);	printf(&quot;%d\n&quot;, x + y);	return 0;&amp;#125;">
+<meta name="twitter:title" content="BZOJ 3670 [Noi2014]动物园">
+<meta name="twitter:description" content="题意  我现在希望求出一个更强大num数组一一对于字符串S的前i个字符构成的子串，既是它的后缀同时又是它的前缀，并且该后缀与该前缀不重叠，将这种字符串的数量记作num[i]。  然后输出$ _ {i = 1} ^ L (num[i] + 1) $">
 
 
 
 
 
 
-  <link rel="canonical" href="http://x.phoenixgs.cn/Solutions/2016/05/29/Hello-World/"/>
+  <link rel="canonical" href="http://x.phoenixgs.cn/Solutions/2018/04/09/BZOJ-3670/"/>
 
 
 
@@ -129,7 +130,7 @@
   };
 </script>
 
-  <title>Hello World | Solutions</title>
+  <title>BZOJ 3670 [Noi2014]动物园 | Solutions</title>
   
 
 
@@ -277,7 +278,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://x.phoenixgs.cn/Solutions/Solutions/2016/05/29/Hello-World/">
+    <link itemprop="mainEntityOfPage" href="http://x.phoenixgs.cn/Solutions/Solutions/2018/04/09/BZOJ-3670/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="PhoenixGS">
@@ -294,7 +295,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">Hello World
+          <h1 class="post-title" itemprop="name headline">BZOJ 3670 [Noi2014]动物园
               
             
           </h1>
@@ -319,7 +320,7 @@
                 
               
 
-              <time title="Created: 2016-05-29 11:07:22" itemprop="dateCreated datePublished" datetime="2016-05-29T11:07:22+08:00">2016-05-29</time>
+              <time title="Created: 2018-04-09 10:21:11" itemprop="dateCreated datePublished" datetime="2018-04-09T10:21:11+08:00">2018-04-09</time>
             
 
             
@@ -336,7 +337,7 @@
                 
                   <span class="post-meta-item-text">Edited on</span>
                 
-                <time title="Modified: 2018-04-10 00:28:03" itemprop="dateModified" datetime="2018-04-10T00:28:03+08:00">2018-04-10</time>
+                <time title="Modified: 2018-04-10 09:21:38" itemprop="dateModified" datetime="2018-04-10T09:21:38+08:00">2018-04-10</time>
               
             
           </span>
@@ -369,9 +370,14 @@
       
 
       
-        <iframe frameborder="no" border="0" marginwidth="0" marginheight="0" width="330" height="86" src="//music.163.com/outchain/player?type=2&amp;id=3993358&amp;auto=0&amp;height=66">
+        <iframe frameborder="no" border="0" marginwidth="0" marginheight="0" width="330" height="86" src="//music.163.com/outchain/player?type=2&amp;id=489970551&amp;auto=0&amp;height=66">
 </iframe>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;cstdio&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="keyword">int</span> x, y;</span><br><span class="line">	<span class="built_in">scanf</span>(<span class="string">"%d%d"</span>, &amp;x, &amp;y);</span><br><span class="line">	<span class="built_in">printf</span>(<span class="string">"%d\n"</span>, x + y);</span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="题意">题意</h2>
+<blockquote>
+<p>我现在希望求出一个更强大num数组一一对于字符串S的前i个字符构成的子串，既是它的后缀同时又是它的前缀，并且该后缀与该前缀不重叠，将这种字符串的数量记作num[i]。</p>
+</blockquote>
+<p>然后输出$ _ {i = 1} ^ L (num[i] + 1) $ <a id="more"></a> ## 题解 这道题十分显然，求出<code>nextx</code>数组的同时求出自动机状态里的集合大小，然后枚举区间的右端点，满足题意不重叠的条件之后就可以算答案了。 ## 代码</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;cstdio&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;cstring&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;algorithm&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> <span class="keyword">int</span> M = <span class="number">1000000007</span>;</span><br><span class="line"><span class="keyword">int</span> T;</span><br><span class="line"><span class="keyword">int</span> ans;</span><br><span class="line"><span class="keyword">char</span> s[<span class="number">2000000</span>];</span><br><span class="line"><span class="keyword">int</span> n;</span><br><span class="line"><span class="keyword">int</span> nextx[<span class="number">2000000</span>];</span><br><span class="line"><span class="keyword">int</span> k[<span class="number">2000000</span>];</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="built_in">scanf</span>(<span class="string">"%d"</span>, &amp;T);</span><br><span class="line">	<span class="keyword">while</span> (T--)</span><br><span class="line">	&#123;</span><br><span class="line">		<span class="built_in">scanf</span>(<span class="string">"%s"</span>, s + <span class="number">1</span>);</span><br><span class="line">		n = <span class="built_in">strlen</span>(s + <span class="number">1</span>);</span><br><span class="line">		k[<span class="number">0</span>] = <span class="number">0</span>;</span><br><span class="line">		k[<span class="number">1</span>] = <span class="number">1</span>;</span><br><span class="line">		<span class="keyword">int</span> j = <span class="number">0</span>;</span><br><span class="line">		<span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">2</span>; i &lt;= n; i++)</span><br><span class="line">		&#123;</span><br><span class="line">			<span class="keyword">while</span> (j &amp;&amp; s[j + <span class="number">1</span>] != s[i])</span><br><span class="line">			&#123;</span><br><span class="line">				j = nextx[j];</span><br><span class="line">			&#125;</span><br><span class="line">			<span class="keyword">if</span> (s[j + <span class="number">1</span>] == s[i])</span><br><span class="line">			&#123;</span><br><span class="line">				j++;</span><br><span class="line">			&#125;</span><br><span class="line">			nextx[i] = j;</span><br><span class="line">			k[i] = k[j] + <span class="number">1</span>;</span><br><span class="line">		&#125;</span><br><span class="line">		j = <span class="number">0</span>;</span><br><span class="line">		ans = <span class="number">1</span>;</span><br><span class="line">		<span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">1</span>; i &lt;= n; i++)</span><br><span class="line">		&#123;</span><br><span class="line">			<span class="keyword">while</span> (j &amp;&amp; s[j + <span class="number">1</span>] != s[i])</span><br><span class="line">			&#123;</span><br><span class="line">				j = nextx[j];</span><br><span class="line">			&#125;</span><br><span class="line">			<span class="keyword">if</span> (s[j + <span class="number">1</span>] == s[i])</span><br><span class="line">			&#123;</span><br><span class="line">				j++;</span><br><span class="line">			&#125;</span><br><span class="line">			<span class="keyword">while</span> (j &gt; i / <span class="number">2</span>)</span><br><span class="line">			&#123;</span><br><span class="line">				j = nextx[j];</span><br><span class="line">			&#125;</span><br><span class="line">			ans = (<span class="keyword">long</span> <span class="keyword">long</span>)ans * (k[j] + <span class="number">1</span>) % M;</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="built_in">printf</span>(<span class="string">"%d\n"</span>, ans);</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
       
     </div>
@@ -390,6 +396,12 @@
 
     <footer class="post-footer">
       
+        <div class="post-tags">
+          
+            <a href="/Solutions/tags/KMP/" rel="tag"># KMP</a>
+          
+        </div>
+      
 
       
       
@@ -399,14 +411,18 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
+              <a href="/Solutions/2018/04/08/HDU-2594/" rel="next" title="HDU 2594 Simpsons’ Hidden Talents">
+                <i class="fa fa-chevron-left"></i> HDU 2594 Simpsons’ Hidden Talents
+              </a>
+            
           </div>
 
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/Solutions/2018/04/08/HDU-2594/" rel="prev" title="HDU 2594 Simpsons’ Hidden Talents">
-                HDU 2594 Simpsons’ Hidden Talents <i class="fa fa-chevron-right"></i>
+              <a href="/Solutions/2018/04/09/BZOJ-1009/" rel="prev" title="BZOJ 1009 [HNOI2008]GT考试">
+                BZOJ 1009 [HNOI2008]GT考试 <i class="fa fa-chevron-right"></i>
               </a>
             
           </div>
@@ -456,8 +472,17 @@
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
 
-      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+      <section class="site-overview-wrap sidebar-panel">
         <div class="site-overview">
           <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
             
@@ -521,6 +546,22 @@
         </div>
       </section>
 
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#题意"><span class="nav-number">1.</span> <span class="nav-text">题意</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
       
 
       
