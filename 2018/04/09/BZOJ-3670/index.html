@@ -110,7 +110,7 @@
 <meta property="og:site_name" content="Solutions">
 <meta property="og:description" content="题意  我现在希望求出一个更强大num数组一一对于字符串S的前i个字符构成的子串，既是它的后缀同时又是它的前缀，并且该后缀与该前缀不重叠，将这种字符串的数量记作num[i]。  然后输出$ _ {i = 1} ^ L (num[i] + 1) $">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2018-04-10T01:21:38.016Z">
+<meta property="og:updated_time" content="2018-04-27T14:08:32.730Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="BZOJ 3670 [Noi2014]动物园">
 <meta name="twitter:description" content="题意  我现在希望求出一个更强大num数组一一对于字符串S的前i个字符构成的子串，既是它的后缀同时又是它的前缀，并且该后缀与该前缀不重叠，将这种字符串的数量记作num[i]。  然后输出$ _ {i = 1} ^ L (num[i] + 1) $">
@@ -337,7 +337,7 @@
                 
                   <span class="post-meta-item-text">Edited on</span>
                 
-                <time title="Modified: 2018-04-10 09:21:38" itemprop="dateModified" datetime="2018-04-10T09:21:38+08:00">2018-04-10</time>
+                <time title="Modified: 2018-04-27 22:08:32" itemprop="dateModified" datetime="2018-04-27T22:08:32+08:00">2018-04-27</time>
               
             
           </span>
@@ -376,7 +376,9 @@
 <blockquote>
 <p>我现在希望求出一个更强大num数组一一对于字符串S的前i个字符构成的子串，既是它的后缀同时又是它的前缀，并且该后缀与该前缀不重叠，将这种字符串的数量记作num[i]。</p>
 </blockquote>
-<p>然后输出$ _ {i = 1} ^ L (num[i] + 1) $ <a id="more"></a> ## 题解 这道题十分显然，求出<code>nextx</code>数组的同时求出自动机状态里的集合大小，然后枚举区间的右端点，满足题意不重叠的条件之后就可以算答案了。 ## 代码</p>
+<p>然后输出$ _ {i = 1} ^ L (num[i] + 1) $ <a id="more"></a></p>
+<h2 id="题解">题解</h2>
+<p>这道题十分显然，求出<code>nextx</code>数组的同时求出自动机状态里的集合大小，然后枚举区间的右端点，满足题意不重叠的条件之后就可以算答案了。 ## 代码</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;cstdio&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;cstring&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;algorithm&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> <span class="keyword">int</span> M = <span class="number">1000000007</span>;</span><br><span class="line"><span class="keyword">int</span> T;</span><br><span class="line"><span class="keyword">int</span> ans;</span><br><span class="line"><span class="keyword">char</span> s[<span class="number">2000000</span>];</span><br><span class="line"><span class="keyword">int</span> n;</span><br><span class="line"><span class="keyword">int</span> nextx[<span class="number">2000000</span>];</span><br><span class="line"><span class="keyword">int</span> k[<span class="number">2000000</span>];</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="built_in">scanf</span>(<span class="string">"%d"</span>, &amp;T);</span><br><span class="line">	<span class="keyword">while</span> (T--)</span><br><span class="line">	&#123;</span><br><span class="line">		<span class="built_in">scanf</span>(<span class="string">"%s"</span>, s + <span class="number">1</span>);</span><br><span class="line">		n = <span class="built_in">strlen</span>(s + <span class="number">1</span>);</span><br><span class="line">		k[<span class="number">0</span>] = <span class="number">0</span>;</span><br><span class="line">		k[<span class="number">1</span>] = <span class="number">1</span>;</span><br><span class="line">		<span class="keyword">int</span> j = <span class="number">0</span>;</span><br><span class="line">		<span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">2</span>; i &lt;= n; i++)</span><br><span class="line">		&#123;</span><br><span class="line">			<span class="keyword">while</span> (j &amp;&amp; s[j + <span class="number">1</span>] != s[i])</span><br><span class="line">			&#123;</span><br><span class="line">				j = nextx[j];</span><br><span class="line">			&#125;</span><br><span class="line">			<span class="keyword">if</span> (s[j + <span class="number">1</span>] == s[i])</span><br><span class="line">			&#123;</span><br><span class="line">				j++;</span><br><span class="line">			&#125;</span><br><span class="line">			nextx[i] = j;</span><br><span class="line">			k[i] = k[j] + <span class="number">1</span>;</span><br><span class="line">		&#125;</span><br><span class="line">		j = <span class="number">0</span>;</span><br><span class="line">		ans = <span class="number">1</span>;</span><br><span class="line">		<span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">1</span>; i &lt;= n; i++)</span><br><span class="line">		&#123;</span><br><span class="line">			<span class="keyword">while</span> (j &amp;&amp; s[j + <span class="number">1</span>] != s[i])</span><br><span class="line">			&#123;</span><br><span class="line">				j = nextx[j];</span><br><span class="line">			&#125;</span><br><span class="line">			<span class="keyword">if</span> (s[j + <span class="number">1</span>] == s[i])</span><br><span class="line">			&#123;</span><br><span class="line">				j++;</span><br><span class="line">			&#125;</span><br><span class="line">			<span class="keyword">while</span> (j &gt; i / <span class="number">2</span>)</span><br><span class="line">			&#123;</span><br><span class="line">				j = nextx[j];</span><br><span class="line">			&#125;</span><br><span class="line">			ans = (<span class="keyword">long</span> <span class="keyword">long</span>)ans * (k[j] + <span class="number">1</span>) % M;</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="built_in">printf</span>(<span class="string">"%d\n"</span>, ans);</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
       
@@ -556,7 +558,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#题意"><span class="nav-number">1.</span> <span class="nav-text">题意</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#题意"><span class="nav-number">1.</span> <span class="nav-text">题意</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#题解"><span class="nav-number">2.</span> <span class="nav-text">题解</span></a></li></ol></div>
             
 
           </div>
@@ -704,7 +706,7 @@
   
 
 
-  <script type="text/javascript" src="/Solutions/js/src/bootstrap.js?v=6.2.0"></script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+  <script type="text/javascript" src="/Solutions/js/src/bootstrap.js?v=6.2.0"></script>
 
 
 
@@ -753,6 +755,29 @@
   
   
 
+  
+    
+      <script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      tex2jax: {
+        inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+        processEscapes: true,
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      }
+    });
+</script>
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Queue(function() {
+      var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+    });
+</script>
+<script type="text/javascript" src="//cdn.jsdelivr.net/npm/mathjax@2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+    
   
 
 
