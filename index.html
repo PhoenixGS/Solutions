@@ -274,6 +274,151 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://x.phoenixgs.cn/Solutions/Solutions/2018/10/24/BZOJ-3163/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="PhoenixGS">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/Solutions/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Solutions">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/Solutions/2018/10/24/BZOJ-3163/" itemprop="url">
+                  BZOJ 3163 [Heoi2013]Eden的新背包问题
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2018-10-24 21:50:24 / Modified: 21:51:28" itemprop="dateCreated datePublished" datetime="2018-10-24T21:50:24+08:00">2018-10-24</time>
+            
+
+            
+              
+
+              
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h2 id="题解">题解</h2>
+<p>这道题第一眼看是维护前缀后缀然后合并的，但是这样复杂度很高，据说可以水过</p>
+<p>因此，不考虑合并。那么问题就是去掉每一个物品，做一次多重背包。这样的复杂度为<span class="math inline">\(O(n^2m)\)</span>。</p>
+<p>考虑以上算法的重复计算部分。可以发现有许多是重复计算了的。那么就可以考虑分治，因为分治可以省去许多重复计算。那么算法就显而易见了。</p>
+<h2 id="代码">代码</h2>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;cstdio&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;algorithm&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;vector&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">long</span> <span class="keyword">long</span> <span class="title">read</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="keyword">char</span> last = <span class="string">'+'</span>, ch = getchar();</span><br><span class="line">	<span class="keyword">while</span> (ch &lt; <span class="string">'0'</span> || ch &gt; <span class="string">'9'</span>) last = ch, ch = getchar();</span><br><span class="line">	<span class="keyword">long</span> <span class="keyword">long</span> tmp = <span class="number">0</span>;</span><br><span class="line">	<span class="keyword">while</span> (ch &gt;= <span class="string">'0'</span> &amp;&amp; ch &lt;= <span class="string">'9'</span>) tmp = tmp * <span class="number">10</span> + ch - <span class="number">48</span>, ch = getchar();</span><br><span class="line">	<span class="keyword">if</span> (last == <span class="string">'-'</span>) tmp = -tmp;</span><br><span class="line">	<span class="keyword">return</span> tmp;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> <span class="keyword">int</span> _n = <span class="number">1000</span> + <span class="number">10</span>, _m = <span class="number">1000</span> + <span class="number">10</span>, _q = <span class="number">300000</span> + <span class="number">10</span>;</span><br><span class="line"><span class="keyword">int</span> n, q;</span><br><span class="line"><span class="keyword">int</span> c[_n], v[_n], m[_n];</span><br><span class="line"><span class="keyword">int</span> que[_m], val[_m];</span><br><span class="line"><span class="keyword">int</span> f[<span class="number">20</span>][_n];</span><br><span class="line"><span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="built_in">std</span>::pair&lt;<span class="keyword">int</span>, <span class="keyword">int</span>&gt; &gt; vec[_n];</span><br><span class="line"><span class="keyword">int</span> ans[_q];</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">update</span><span class="params">(<span class="keyword">int</span> *f, <span class="keyword">int</span> pos)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; c[pos]; i++)</span><br><span class="line">	&#123;</span><br><span class="line">		<span class="keyword">int</span> head = <span class="number">1</span>, tail = <span class="number">1</span>;</span><br><span class="line">		que[<span class="number">1</span>] = <span class="number">0</span>;</span><br><span class="line">		val[<span class="number">1</span>] = f[i];</span><br><span class="line">		<span class="keyword">for</span> (<span class="keyword">int</span> j = <span class="number">1</span>; i + c[pos] * j &lt;= <span class="number">1000</span>; j++)</span><br><span class="line">		&#123;</span><br><span class="line">			<span class="keyword">while</span> (head &lt;= tail &amp;&amp; j - que[head] &gt; m[pos])</span><br><span class="line">			&#123;</span><br><span class="line">				head++;</span><br><span class="line">			&#125;</span><br><span class="line">			<span class="keyword">while</span> (head &lt;= tail &amp;&amp; f[i + c[pos] * j] &gt;= val[tail] + (j - que[tail]) * v[pos])</span><br><span class="line">			&#123;</span><br><span class="line">				tail--;</span><br><span class="line">			&#125;</span><br><span class="line">			tail++;</span><br><span class="line">			que[tail] = j;</span><br><span class="line">			val[tail] = f[i + c[pos] * j];</span><br><span class="line">			f[i + c[pos] * j] = val[head] + (j - que[head]) * v[pos];</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">solve</span><span class="params">(<span class="keyword">int</span> l, <span class="keyword">int</span> r, <span class="keyword">int</span> d)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="keyword">if</span> (l == r)</span><br><span class="line">	&#123;</span><br><span class="line">		<span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; (<span class="keyword">int</span>)vec[l].size(); i++)</span><br><span class="line">		&#123;</span><br><span class="line">			ans[vec[l][i].second] = f[d][vec[l][i].first];</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">return</span>;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">int</span> mid = (l + r) &gt;&gt; <span class="number">1</span>;</span><br><span class="line">	<span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt;= <span class="number">1000</span>; i++)</span><br><span class="line">	&#123;</span><br><span class="line">		f[d + <span class="number">1</span>][i] = f[d][i];</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">for</span> (<span class="keyword">int</span> i = mid + <span class="number">1</span>; i &lt;= r; i++)</span><br><span class="line">	&#123;</span><br><span class="line">		update(f[d + <span class="number">1</span>], i);</span><br><span class="line">	&#125;</span><br><span class="line">	solve(l, mid, d + <span class="number">1</span>);</span><br><span class="line">	<span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt;= <span class="number">1000</span>; i++)</span><br><span class="line">	&#123;</span><br><span class="line">		f[d + <span class="number">1</span>][i] = f[d][i];</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">for</span> (<span class="keyword">int</span> i = l; i &lt;= mid; i++)</span><br><span class="line">	&#123;</span><br><span class="line">		update(f[d + <span class="number">1</span>], i);</span><br><span class="line">	&#125;</span><br><span class="line">	solve(mid + <span class="number">1</span>, r, d + <span class="number">1</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	n = read();</span><br><span class="line">	<span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">1</span>; i &lt;= n; i++)</span><br><span class="line">	&#123;</span><br><span class="line">		c[i] = read();</span><br><span class="line">		v[i] = read();</span><br><span class="line">		m[i] = read();</span><br><span class="line">	&#125;</span><br><span class="line">	q = read();</span><br><span class="line">	<span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">1</span>; i &lt;= q; i++)</span><br><span class="line">	&#123;</span><br><span class="line">		<span class="keyword">int</span> pos, sum;</span><br><span class="line">		pos = read();</span><br><span class="line">		sum = read();</span><br><span class="line">		pos++;</span><br><span class="line">		vec[pos].push_back(<span class="built_in">std</span>::make_pair(sum, i));</span><br><span class="line">	&#125;</span><br><span class="line">	solve(<span class="number">1</span>, n, <span class="number">1</span>);</span><br><span class="line">	<span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">1</span>; i &lt;= q; i++)</span><br><span class="line">	&#123;</span><br><span class="line">		<span class="built_in">printf</span>(<span class="string">"%d\n"</span>, ans[i]);</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+          
+        
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://x.phoenixgs.cn/Solutions/Solutions/2018/04/10/HDU-4333/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1231,7 +1376,7 @@
                 
                   <a href="/Solutions/archives/">
                 
-                    <span class="site-state-item-count">6</span>
+                    <span class="site-state-item-count">7</span>
                     <span class="site-state-item-name">posts</span>
                   </a>
                 </div>
@@ -1466,6 +1611,8 @@
 
   
   
+    
+      
     
       
     
