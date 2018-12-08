@@ -1,4 +1,16 @@
 #include <cstdio>
+#include <cmath>
+#include <cstring>
+
+int flag[200000];
+int primenum;
+long long prime[200000];
+unsigned long long sum[200000];
+unsigned long long g[200000];
+int knum;
+int last;
+long long v[200000];
+int pos1[200000], pos2[200000];
 
 void get_prime(int n)
 {
@@ -8,6 +20,7 @@ void get_prime(int n)
 		{
 			primenum++;
 			prime[primenum] = i;
+			sum[primenum] = sum[primenum - 1] + i;
 		}
 		for (int j = 1; j <= primenum && i * prime[j] <= n; j++)
 		{
@@ -22,6 +35,7 @@ void get_prime(int n)
 
 unsigned long long solve(long long n)
 {
+	unsigned long long ans = 0;
 	knum = sqrt(n);
 	last = 0;
 	for (long long i = 1, j, t; i <= n; i = j + 1)
@@ -38,22 +52,23 @@ unsigned long long solve(long long n)
 		{
 			pos2[n / t] = last;
 		}
-		g[last] = t - 1;
 	}
 	for (int i = 1; i <= last; i++)
 	{
-		
+		g[i] = ((v[i] & 1) ? ((v[i] + 1) / 2 * v[i]) : (v[i] / 2 * (v[i] + 1))) - 1;
 	}
 	for (int i = 1; i <= primenum; i++)
 	{
 		for (int j = 1; j <= last && prime[i] * prime[i] <= v[j]; j++)
 		{
 			int op = v[j] / prime[i] <= knum ? pos1[v[j] / prime[i]] : pos2[n / (v[j] / prime[i])];
-			g[j] = g[j] - (g[op] - (j - 1));
+			g[j] = g[j] - prime[i] * (g[op] - sum[i - 1]);
+			if (j == 1)
+			{
+				ans += g[op] - sum[i - 1];
+			}
 		}
 	}
-	ans = 0;
-	query(n, 1);
 	return ans;
 }
 
