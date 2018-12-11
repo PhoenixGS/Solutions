@@ -38,17 +38,16 @@ unsigned long long solve(long long n)
 		{
 			pos2[n / t] = last;
 		}
-		g[last] = t - 1;
 	}
-	for (int i = 1; i <= last; i++)
+	for (int i = 2; i <= last; i++)
 	{
-		
+		g[i] = (i & 1) ? ((i + 1) / 2 * i - 1) : (i / 2 * (i + 1) - 1);
 	}
 	for (int i = 1; i <= primenum; i++)
 	{
 		for (int j = 1; j <= last && prime[i] * prime[i] <= v[j]; j++)
 		{
-			int op = v[j] / prime[i] <= knum ? pos1[v[j] / prime[i]] : pos2[n / (v[j] / prime[i])];
+						int op = v[j] / prime[i] <= knum ? pos1[v[j] / prime[i]] : pos2[n / (v[j] / prime[i])];
 			g[j] = g[j] - (g[op] - (j - 1));
 		}
 	}
