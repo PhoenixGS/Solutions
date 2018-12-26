@@ -34,7 +34,7 @@ void add(int u, int v, int cost)
 	head[u] = edgenum;
 }
 
-void findc(int u, int father, int pre)
+bool findc(int u, int father, int pre)
 {
 	vis[u] = 1;
 	top++;
@@ -48,27 +48,31 @@ void findc(int u, int father, int pre)
 			stac[top] = cost;
 			if (vis[v])
 			{
-				if (! last)
+				last = 0;
+				for (int k = top; k >= 1 && stack[k] != v; k--)
 				{
-					last = 0;
-					int k = top;
-					for (; k >= 1 && stack[k] != v; k--);
-					for (int i = k; i <= top; i++)
-					{
-						ff[stack[i]] = 1;
-						last++;
-						vv[last - 1] = stack[i];
-						ss[last - 1] = stac[i];
-					}
+					ff[stack[k]] = 1;
+					last++;
+					vv[last - 1] = stack[k];
+					ss[last - 1] = stac[k - 1];
 				}
+				ff[v] = 1;
+				last++;
+				vv[last - 1] = v;
+				ss[last - 1] = cost;
+				return true;
 			}
 			else
 			{
-				findc(v, u, i);
+				if (findc(v, u, i))
+				{
+					return true;
+				}
 			}
 		}
 	}
 	top--;
+	return false;
 }
 
 void dfs(int u, int father)
