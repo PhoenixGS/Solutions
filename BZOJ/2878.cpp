@@ -52,12 +52,9 @@ void findc(int u, int father, int pre)
 				{
 					last = 0;
 					int k = top;
-//					puts("V");
 					for (; k >= 1 && stack[k] != v; k--);
-//					puts("P");
 					for (int i = k; i <= top; i++)
 					{
-//						printf("LL%d\n", stack[i]);
 						ff[stack[i]] = 1;
 						last++;
 						vv[last - 1] = stack[i];
@@ -76,10 +73,6 @@ void findc(int u, int father, int pre)
 
 void dfs(int u, int father)
 {
-	if (u == 79)
-	{
-//		printf("XX%d\n", ff[u]);
-	}
 	cnt[u] = 0;
 	f[u] = 0;
 	for (int i = head[u]; i; i = nextx[i])
@@ -94,7 +87,6 @@ void dfs(int u, int father)
 	{
 		int v = vet[i];
 		int cost = val[i];
-//		if (u == 79) printf("O%d %.5f %d\n", v, (double)f[v], ff[v]);
 		if (v != father && ! ff[v])
 		{
 			dfs(v, u);
@@ -133,12 +125,6 @@ void dfs2(int u, int father)
 			{
 				g[v] = (f[u] * cnt[u] - f[v] - cost + g[u]) / cnt[u] + cost;
 			}
-			/*
-			g[v] = father == 0 ? (f[u] * cnt[u] - f[v] - cost) / (cnt[u] - 1) + cost : (f[u] * cnt[u] - f[v] - cost + g[u]) / cnt[u] + cost;
-			if (father == 0 && cnt[u] - 1 == 0)
-			{
-				g[v] = cost;
-			}*/
 			dfs2(v, u);
 		}
 	}
@@ -157,21 +143,17 @@ void solve()
 	sum = ss[0];
 	for (int i = 1; i < last; i++)
 	{
-//		if (cnt[vv[i]] + (vv[i] != vv[last - 1]) == 0)
 		if (i == last - 1)
 		{
 			s = s + mul * (f[vv[i]] + sum);
 		}
 		else
 		{
-//			s = s + mul * (f[vv[i]] + sum) * cnt[vv[i]] / (cnt[vv[i]] + (vv[i] != vv[last - 1]));
 			s = s + mul * (f[vv[i]] + sum) * cnt[vv[i]] / (cnt[vv[i]] + 1);
 		}
 		mul = mul / (cnt[vv[i]] + 1);
 		sum = sum + ss[i];
 	}
-//	printf("M%f\n", mul);
-//	printf("S%f\n", sum);
 	g[vv[0]] += s;
 	for (int i = last - 1; i >= 1; i--)
 	{
@@ -181,7 +163,6 @@ void solve()
 		s = s - mm * (cnt[vv[i]] + 1) * (cnt[vv[(i - 1 + last) % last]] + 1) * (f[vv[(i - 1 + last) % last]] + sum - ss[(i - 1 + last) % last] - ss[i]) * cnt[vv[(i - 1 + last) % last]] / (cnt[vv[(i - 1 + last) % last]] + 1);
 		s = s + mm * (cnt[vv[i]] + 1) * (cnt[vv[(i - 1 + last) % last]] + 1) * (f[vv[(i - 1 + last) % last]] + sum - ss[(i - 1 + last) % last] - ss[i]);
 		s = s + ss[i];
-//		s = (s - mm * (cnt[vv[i]] + 1) * (cnt[vv[(i + 1) % last]] + 1) * (f[vv[i]] + sum - ss[i])) / (cnt[vv[(i + 1) % last]] + 1) + f[vv[(i + 1) % last]] * cnt[vv[(i + 1) % last]] / (cnt[vv[(i + 1) % last]] + 1) + ss[i];
 		g[vv[i]] += s;
 	}
 }
@@ -215,29 +196,11 @@ int main()
 	else
 	{
 		findc(1, 0, 0);
-/*		for (int i = 0; i < last; i++)
-		{
-			printf("%d ", vv[i]);
-		}
-		puts("");
-		for (int i = 0; i < last; i++)
-		{
-			printf("%d ", ss[i]);
-		}
-		puts("");*/
 		for (int i = 0; i < last; i++)
 		{
 			dfs(vv[i], 0);
 		}
-/*		for (int i = 0; i < last; i++)
-		{
-			printf("%d %d\n", vv[i], ss[i]);
-		}*/
 		solve();
-/*		for (int i = 0; i < last; i++)
-		{
-			printf("L%d %f\n", vv[i], g[vv[i]]);
-		}*/
 		for (int i = 0; i < last / 2; i++)
 		{
 			std::swap(vv[i], vv[last - 1 - i]);
@@ -253,7 +216,6 @@ int main()
 		}
 		for (int i = 1; i <= n; i++)
 		{
-//			printf("%.5f %.5f\n", (double)f[i], (double)g[i]);
 			if (ff[i])
 			{
 				ans = ans + (f[i] * cnt[i] + g[i]) / (cnt[i] + 2);
