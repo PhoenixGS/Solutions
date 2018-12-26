@@ -22,8 +22,8 @@ int stack[_n], stac[_n];
 int ff[_n];
 int last;
 int vv[_n], ss[_n];
-double f[_n], g[_n];
-double ans;
+long double f[_n], g[_n];
+long double ans;
 
 void add(int u, int v, int cost)
 {
@@ -146,10 +146,10 @@ void dfs2(int u, int father)
 
 void solve()
 {
-	double mul = 1.0;
-	double s = 0.0;
-	double mm = 1.0;
-	double sum = 0;
+	long double mul = 1.0;
+	long double s = 0.0;
+	long double mm = 1.0;
+	long double sum = 0;
 	for (int i = 0; i < last; i++)
 	{
 		mm = mm / (cnt[vv[i]] + 1);
