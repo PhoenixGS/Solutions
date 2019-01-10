@@ -143,7 +143,7 @@ int main()
 	nn = n;
 	for (int i = 1; i <= n; i++)
 	{
-		if ((int)vec[i].size() < 2)
+		if ((int)vec[i].size() <= 2)
 		{
 			for (int j = 0; j < (int)vec[i].size(); j++)
 			{
