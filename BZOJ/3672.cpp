@@ -80,6 +80,20 @@ void getroot(int u, int father, int S)
 	}
 }
 
+void calcsize(int u, int father)
+{
+	size[u] = 1;
+	for (int i = head[u]; i; i = nextx[i])
+	{
+		int v = vet[i];
+		if (v != father && ! vis[v])
+		{
+			calcsize(v, u);
+			size[u] += size[v];
+		}
+	}
+}
+
 void dfs(int u, int father)
 {
 	last++;
@@ -97,12 +111,12 @@ void dfs(int u, int father)
 
 inline long long up(int x, int y)
 {
-	return f[x] - f[y];
+	return f[y] - f[x];
 }
 
 inline long long down(int x, int y)
 {
-	return deep[x] - deep[y];
+	return deep[y] - deep[x];
 }
 
 inline long long calc(int u, int v)
@@ -112,7 +126,6 @@ inline long long calc(int u, int v)
 
 void solve(int u, int S)
 {
-	printf("K%d %d\n", u, S);
 	vis[u] = true;
 	if (S == 1)
 	{
@@ -123,16 +136,16 @@ void solve(int u, int S)
 	{
 		k = fa[k];
 	}
+	calcsize(u, 0);
 	if (fa[u] != 0 && ! vis[fa[u]])
 	{
 		root = 0;
-		getroot(fa[u], 0, S - size[u]);
-		solve(root, S - size[u]);
+		getroot(fa[u], 0, size[fa[u]]);
+		solve(root, size[fa[u]]);
 		int v = fa[u];
 		while (v != k && deep[u] - deep[v] <= l[u])
 		{
-			f[u] = std::min(f[u], f[v] + p[u] * (deep[u] - deep[v]) + q[u]);
-			printf("OOO%d %d %lld\n", u, v, f[v] + p[u] * (deep[u] - deep[v]) + q[u]);
+			f[u] = std::min(f[u], calc(u, v));
 			v = fa[v];
 		}
 	}
@@ -149,47 +162,36 @@ void solve(int u, int S)
 	std::sort(vv + 1, vv + last + 1, comp);
 	int now = u;
 	top = 0;
-	printf("#");
-	printf("%d\n", u);
 	for (int i = 1; i <= last; i++)
 	{
-		printf("M%d %d\n", vv[i], u);
 		while (now != k && deep[vv[i]] - deep[now] <= l[vv[i]])
 		{
-			while (top >= 2 && up(stack[top], stack[top - 1]) * down(stack[top], now) <= up(stack[top], now) * down(stack[top - 1], stack[top]))
+//			while (top >= 2 && up(stack[top - 1], stack[top]) * down(stack[top], now) <= up(stack[top], now) * down(stack[top - 1], stack[top]))
+			while (top >= 2 && (long double)up(stack[top - 1], stack[top]) / down(stack[top - 1], stack[top]) <= (long double)up(stack[top], now) / down(stack[top], now))
 			{
-				printf("^%lld %lld %lld\n", up(stack[top], stack[top - 1]), down(stack[top], now), up(stack[top], stack[top - 1]) * down(stack[top], now) );
 				top--;
 			}
 			top++;
 			stack[top] = now;
-			printf("??%d %lld %lld\n", now, deep[vv[i]] - deep[now], l[vv[i]]);
 			now = fa[now];
 		}
-		printf("X%d\n", top);
 		if (top)
 		{
-			int l = 1;
-			int r = top;
-			while (l < r)
+			int ll = 1;
+			int rr = top;
+			while (ll < rr)
 			{
-				int mid = (l + r) >> 1;
-				if (calc(vv[i], stack[mid]) < calc(vv[i], stack[mid + 1]))
+				int mid = (ll + rr) >> 1;
+				if (calc(vv[i], stack[mid]) <= calc(vv[i], stack[mid + 1]))
 				{
-					r = mid;
+					rr = mid;
 				}
 				else
 				{
-					l = mid + 1;
+					ll = mid + 1;
 				}
 			}
-			printf("L%d %d\n", vv[i], stack[l]);
-			for (int j = 1; j <= top; j++)
-			{
-				printf("LL%d %lld\n", stack[j], calc(vv[i], stack[j]));
-			}
-			puts("");
-			f[vv[i]] = std::min(f[vv[i]], calc(vv[i], stack[l]));
+			f[vv[i]] = std::min(f[vv[i]], calc(vv[i], stack[ll]));
 		}
 	}
 	for (int i = head[u]; i; i = nextx[i])
