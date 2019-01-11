@@ -149,7 +149,7 @@ namespace treap
 int main()
 {
 #ifdef debug
-	freopen("3224.in", "r", stdin);
+	freopen("3369.in", "r", stdin);
 #endif
 	srand(time(NULL));
 	scanf("%d", &n);
@@ -183,4 +183,3 @@ int main()
 	}
 	return 0;
 }
-
