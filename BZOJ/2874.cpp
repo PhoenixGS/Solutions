@@ -75,6 +75,10 @@ void change(int &k, int l, int r, unsigned long long x, unsigned long long y, un
 
 unsigned long long query(int k, int l, int r, unsigned long long x, unsigned long long y)
 {
+	if (! k)
+	{
+		return 0ull;
+	}
 	if (1 <= l && r <= y)
 	{
 		return sum[k] * (x * y + x + y + 1ull) - sumx[k] * (y + 1) - sumy[k] * (x + 1) + sumxy[k];
