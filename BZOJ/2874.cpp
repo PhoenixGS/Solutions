@@ -73,36 +73,21 @@ void change(int &k, int l, int r, unsigned long long x, unsigned long long y, un
 	pushup(k);
 }
 
-unsigned long long query(int k, int l, int r, int x, int y, int cas)
+unsigned long long query(int k, int l, int r, unsigned long long x, unsigned long long y)
 {
 	if (1 <= l && r <= y)
 	{
-		if (cas == 0)
-		{
-			return sum[k];
-		}
-		if (cas == 1)
-		{
-			return sumx[k];
-		}
-		if (cas == 2)
-		{
-			return sumy[k];
-		}
-		if (cas == 3)
-		{
-			return sumxy[k];
-		}
+		return sum[k] * (x * y + x + y + 1ull) - sumx[k] * (y + 1) - sumy[k] * (x + 1) + sumxy[k];
 	}
 	unsigned long long ans = 0;
 	int mid = (l + r) >> 1;
 	if (1 <= mid)
 	{
-		ans += query(ch[k][0], l, mid, x, y, cas);
+		ans += query(ch[k][0], l, mid, x, y);
 	}
 	if (y > mid)
 	{
-		ans += query(ch[k][1], mid + 1, r, x, y, cas);
+		ans += query(ch[k][1], mid + 1, r, x, y);
 	}
 	return ans;
 }
@@ -110,12 +95,7 @@ unsigned long long query(int k, int l, int r, int x, int y, int cas)
 unsigned long long calc(int xx, int yy)
 {
 	int xxx = std::upper_bound(z + 1, z + cnt + 1, xx) - z - 1;
-	unsigned long long s0 = query(root[xxx], A, D, xx, yy, 0);
-	unsigned long long s1 = query(root[xxx], A, D, xx, yy, 1);
-	unsigned long long s2 = query(root[xxx], A, D, xx, yy, 2);
-	unsigned long long s3 = query(root[xxx], A, D, xx, yy, 3);
-	unsigned long long x = xx, y = yy;
-	return s0 * (x * y + x + y + 1ull) - s1 * (y + 1) - s2 * (x + 1) + s3;
+	return query(root[xxx], A, D, xx, yy);
 }
 
 int main()
