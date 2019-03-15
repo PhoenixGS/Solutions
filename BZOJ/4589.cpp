@@ -1,22 +1,16 @@
 #include <cstdio>
 
 const int M = 1000000007;
-int flag[60000];
-int ans[120000], tmp[120000];
-int tmpx[120000], tmpy[120000];
-int n, invn;
-int t, m;
+const int _n = 200000 + 10;
+int n, m;
+int nn, bit;
+int flag[_n];
+int primenum;
+int prime[_n];
+int f[_n];
+int inv2;
 
-void print(int *x)
-{
-	for (int i = 0; i < n; i++)
-	{
-		printf("%d ", x[i]);
-	}
-	puts("");
-}
-
-int pow_mod(int x, int p, int M)
+inline int pow_mod(int x, int p, int M)
 {
 	int ans = 1;
 	int tmp = x;
@@ -32,77 +26,84 @@ int pow_mod(int x, int p, int M)
 	return ans;
 }
 
-void FWT(int *x)
+void FWT(int *x, int bit)
 {
-	for (int i = 1; i < n; i <<= 1)
+	for (int i = 0; i < bit; i++)
 	{
-		for (int j = 0; j < n; j += (i << 1))
+		for (int j = 0; j < (1 << bit); j++)
 		{
-			for (int k = 0; k < i; k++)
+			if (j & (1 << i))
 			{
-				int xx = x[j + k];
-				int yy = x[j + k + i];
-				x[j + k] = (xx + yy) % M;
-				x[j + k + i] = (xx - yy + M) % M;
+				int xx = x[j - (1 << i)];
+				int yy = x[j];
+				x[j - (1 << i)] = (xx + yy) % M;
+				x[j] = ((long long)xx - yy + M) % M;
 			}
 		}
 	}
 }
 
-void mul(int *x, int *y)
+void DFWT(int *x, int bit)
 {
-	for (int i = 0; i < n; i++)
+	for (int i = 0; i < bit; i++)
 	{
-		x[i] = (long long)x[i] * y[i] % M;
+		for (int j = 0; j < (1 << bit); j++)
+		{
+			if (j & (1 << i))
+			{
+				int xx = x[j - (1 << i)];
+				int yy = x[j];
+				x[j - (1 << i)] = ((long long)xx + yy) % M * inv2 % M;
+				x[j] = ((long long)xx - yy + M) % M * inv2 % M;
+			}
+		}
 	}
 }
+	
 
 int main()
 {
-	flag[0] = 1;
-	flag[1] = 1;
-	for (int i = 2; i <= 50005; i++)
+	inv2 = pow_mod(2, M - 2, M);
+	for (int i = 2; i <= 50000; i++)
 	{
 		if (! flag[i])
 		{
-			for (int j = i + i; j <= 50005; j += i)
+			primenum++;
+			prime[primenum] = i;
+		}
+		for (int j = 1; j <= primenum && i * prime[j] <= 50000; j++)
+		{
+			flag[i * prime[j]] = 1;
+			if (i % prime[j] == 0)
 			{
-				flag[j] = 1;
+				break;
 			}
 		}
 	}
-	while (scanf("%d%d", &t, &m) != EOF)
+	while (scanf("%d%d", &m, &n) == 2)
 	{
-		n = 1;
-		for (n = 1; n <= m; n <<= 1);
-		invn = pow_mod(n, M - 2, M);
-		for (int i = 0; i < n; i++)
+		nn = 1;
+		bit = 0;
+		while (nn <= n)
 		{
-			ans[i] = 0;
-			tmp[i] = 0;
+			nn <<= 1;
+			bit++;
 		}
-		ans[0] = 1;
-		for (int i = 0; i <= m; i++)
+		for (int i = 0; i < nn; i++)
 		{
-			tmp[i] = 1 - flag[i];
+			f[i] = 0;
 		}
-		FWT(ans);
-		FWT(tmp);
-		while (t)
+		for (int i = 2; i <= n; i++)
 		{
-			if (t & 1)
-			{
-				mul(ans, tmp);
-			}
-			mul(tmp, tmp);
-			t >>= 1;
+			f[i] = 1 - flag[i];
 		}
-		FWT(ans);
-		for (int i = 0; i < n; i++)
+		FWT(f, bit);
+		for (int i = 0; i < nn; i++)
 		{
-			ans[i] = (long long)ans[i] * invn % M;
+			f[i] = pow_mod(f[i], m, M);
 		}
-		printf("%d\n", ans[0]);
+		DFWT(f, bit);
+		printf("%d\n", f[0]);
 	}
 	return 0;
 }

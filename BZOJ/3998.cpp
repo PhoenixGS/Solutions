@@ -1,39 +1,37 @@
 #include <cstdio>
 #include <cstring>
 #include <queue>
-#include <algorithm>
 
-char st[600000];
-int n, cas;
-long long k;
-int knum, last;
-int len[1200000], to[1200000][27], pre[1200000];
-long long s[1200000], ss[1200000], kk[1200000];
-int cnt[1200000];
+const int _n = 500000 + 10;
+int n;
+int cas;
+long long rank;
+char st[_n];
+int last, knum;
+int pre[2 * _n], len[2 * _n], ch[2 * _n][26];
+int cnt[2 * _n];
+long long sum[2 * _n];
+int vis[2 * _n];
+int in[2 * _n];
 std::queue<int> que;
-int anss;
-char ans[1200000];
 
-void add(int c)
+void extend(int c)
 {
-	int u = last;
 	knum++;
+	int u = last;
 	int v = knum;
 	len[v] = len[u] + 1;
 	last = v;
-//	printf("X%d %d\n", c, u);
-	for (; u && ! to[u][c]; u = pre[u])
+	for (; u && ! ch[u][c]; u = pre[u])
 	{
-//		printf("G%d %d\n", u, to[u][c]);
-		to[u][c] = v;
+		ch[u][c] = v;
 	}
-//	printf("Y%d %d\n", c, u);
 	if (! u)
 	{
 		pre[v] = 1;
 		return;
 	}
-	int w = to[u][c];
+	int w = ch[u][c];
 	if (len[u] + 1 == len[w])
 	{
 		pre[v] = w;
@@ -42,100 +40,86 @@ void add(int c)
 	knum++;
 	int neww = knum;
 	pre[neww] = pre[w];
+	len[neww] = len[u] + 1;
 	for (int i = 0; i < 26; i++)
 	{
-		to[neww][i] = to[w][i];
+		ch[neww][i] = ch[w][i];
 	}
-	len[neww] = len[u] + 1;
 	pre[w] = pre[v] = neww;
-	for (; u && to[u][c] == w; u = pre[u])
+	for (; u && ch[u][c] == w; u = pre[u])
 	{
-		to[u][c] = neww;
+		ch[u][c] = neww;
 	}
 }
 
 void dfs(int u)
 {
-	if (ss[u])
+	if (vis[u])
 	{
 		return;
 	}
-	if (cas == 0)
-	{
-		//ss[u] = len[u] - len[pre[u]];
-		ss[u] = kk[u] = 1;
-	}
-	else
-	{
-		//ss[u] = s[u] * (len[u] - len[pre[u]]);
-		ss[u] = kk[u] = s[u];
-	}
+	vis[u] = 1;
 	for (int i = 0; i < 26; i++)
 	{
-		if (to[u][i])
+		if (ch[u][i])
 		{
-			dfs(to[u][i]);
-			ss[u] += ss[to[u][i]];
+			dfs(ch[u][i]);
+			sum[u] += sum[ch[u][i]];
 		}
 	}
-//	printf("O%d %lld %lld\n", u, kk[u], ss[u]);
+	if (u != 1)
+	{
+		sum[u] += cas == 0 ? 1 : cnt[u];
+	}
 }
 
-void print()
+void find(int u, long long rank)
 {
-	for (int i = 1; i <= anss; i++)
+	if (u != 1)
 	{
-		printf("%c", ans[i]);
+		rank -= (cas == 0 ? 1 : cnt[u]);
 	}
-	puts("");
-}
-
-void solve(int u, long long k)
-{
-	if (k <= kk[u])
+	if (rank <= 0)
 	{
-//		printf("K%d %lld\n", u, kk[u]);
-		print();
-		std::exit(0);
+		return;
 	}
-	k -= kk[u];
 	for (int i = 0; i < 26; i++)
 	{
-		if (to[u][i])
+		if (rank > sum[ch[u][i]])
 		{
-			if (k > ss[to[u][i]])
-			{
-				k -= ss[to[u][i]];
-			}
-			else
-			{
-				anss++;
-				ans[anss] = i + 'a';
-				solve(to[u][i], k);
-			}
+			rank -= sum[ch[u][i]];
+		}
+		else
+		{
+			printf("%c", i + 'a');
+			find(ch[u][i], rank);
+			return;
 		}
 	}
 }
 
 int main()
 {
+#ifdef debug
+	freopen("3998.in", "r", stdin);
+#endif
 	scanf("%s", st + 1);
+	scanf("%d%lld", &cas, &rank);
 	n = strlen(st + 1);
-	scanf("%d%lld", &cas, &k);
-	knum = 1;
 	last = 1;
+	knum = 1;
 	for (int i = 1; i <= n; i++)
 	{
-		add(st[i] - 'a');
-		s[last]++;
+		extend(st[i] - 'a');
+		cnt[last]++;
 	}
 	for (int i = 2; i <= knum; i++)
 	{
-		cnt[pre[i]]++;
+		in[pre[i]]++;
 	}
 	for (int i = 1; i <= knum; i++)
 	{
-		if (! cnt[i])
+		if (! in[i])
 		{
 			que.push(i);
 		}
@@ -144,17 +128,22 @@ int main()
 	{
 		int u = que.front();
 		que.pop();
-		s[pre[u]] += s[u];
-		cnt[pre[u]]--;
-		if (! cnt[pre[u]])
+		cnt[pre[u]] += cnt[u];
+		in[pre[u]]--;
+		if (! in[pre[u]])
 		{
 			que.push(pre[u]);
 		}
 	}
 	dfs(1);
-	kk[1] = 0;
-	solve(1, k);
-	printf("-1\n");
-//	printf("G%lld\n", ss[1]);
+	if (rank > sum[1])
+	{
+		puts("-1");
+	}
+	else
+	{
+		find(1, rank);
+		puts("");
+	}
 	return 0;
 }

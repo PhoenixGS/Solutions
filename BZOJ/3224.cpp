@@ -1,157 +1,186 @@
 #include <cstdio>
 #include <cstdlib>
-#include <map>
+#include <ctime>
+#include <algorithm>
 
-int size[200000], ch[200000][2], key[200000], fix[200000];
-int root;
-int n;
-int num;
-
-void pushup(int k)
+long long read()
 {
-	size[k] = size[ch[k][0]] + size[ch[k][1]] + 1;
-}
-
-int merge(int x, int y)
-{
-	if (! x || ! y)
-	{
-		return x ^ y;
-	}
-	if (fix[x] < fix[y])
-	{
-		ch[x][1] = merge(ch[x][1], y);
-		pushup(x);
-		return x;
-	}
-	else
-	{
-		ch[y][0] = merge(x, ch[y][0]);
-		pushup(y);
-		return y;
-	}
-}
-
-std::pair<int, int> split(int x, int rank)
-{
-	if (! x)
-	{
-		return std::make_pair(0, 0);
-	}
-	std::pair<int, int> tmp;
-	if (size[ch[x][0]] >= rank)
-	{
-		tmp = split(ch[x][0], rank);
-		ch[x][0] = tmp.second;
-		pushup(x);
-		tmp.second = x;
-	}
-	else
-	{
-		tmp = split(ch[x][1], rank - size[ch[x][0]] - 1);
-		ch[x][1] = tmp.first;
-		pushup(x);
-		tmp.first = x;
-	}
+	char last = '+', ch = getchar();
+	while (ch < '0' || ch > '9') last = ch, ch = getchar();
+	long long tmp = 0;
+	while (ch >= '0' && ch <= '9') tmp = tmp * 10 + ch - 48, ch = getchar();
+	if (last == '-') tmp = -tmp;
 	return tmp;
 }
 
-int findkth(int x, int k)
-{
-	std::pair<int, int> tmpx = split(x, k - 1);
-	std::pair<int, int> tmpy = split(tmpx.second, 1);
-	int ans = key[tmpy.first];
-	root = merge(tmpx.first, merge(tmpy.first, tmpy.second));
-	return ans;
-}
+const int _n = 100000 + 10;
+int n;
 
-int getkthlast(int x, int k)
+namespace treap
 {
-	if (! x)
-	{
-		return 0;
-	}
-	if (k < key[x])
-	{
-		return getkthlast(ch[x][0], k);
-	}
-	else
-	{
-		return getkthlast(ch[x][1], k) + size[ch[x][0]] + 1;
-	}
-}
+	int root;
+	int knum;
+	int tree[_n], size[_n], rank[_n], ch[_n][2];
 
-int getkthfirst(int x, int k)
-{
-	return getkthlast(x, k - 1) + 1;
-}
-
-void insert(int x)
-{
-	int k = getkthlast(root, x);
-	std::pair<int, int> tmp = split(root, k);
-	num++;
-	key[num] = x;
-	fix[num] = rand();
-	size[num] = 1;
-	root = merge(merge(tmp.first, num), tmp.second);
-}
-
-void deletex(int x)
-{
-	int k = getkthlast(root, x);
-	if (findkth(root, k) != x)
+	inline int randx()
 	{
-		return;
+		return (rand() << 16) + rand();
 	}
-	std::pair<int, int> tmpx = split(root, k - 1);
-	std::pair<int, int> tmpy = split(tmpx.second, 1);
-	root = merge(tmpx.first, tmpy.second);
+
+	void pushup(int k)
+	{
+		size[k] = size[ch[k][0]] + size[ch[k][1]] + 1;
+	}
+
+	int newnode(int key)
+	{
+		knum++;
+		size[knum] = 1;
+		tree[knum] = key;
+		rank[knum] = randx();
+		return knum;
+	}
+
+	void print(int x)
+	{
+		if (! x)
+		{
+			return;
+		}
+		print(ch[x][0]);
+		printf("%d ", tree[x]);
+		print(ch[x][1]);
+	}
+
+	int get(int key)
+	{
+		int ans = 0;
+		int now = root;
+		while (now)
+		{
+			if (tree[now] < key)
+			{
+				ans += size[ch[now][0]] + 1;
+				now = ch[now][1];
+			}
+			else
+			{
+				now = ch[now][0];
+			}
+		}
+		return ans;
+	}
+
+	int merge(int x, int y)
+	{
+		if (x == 0 || y == 0)
+		{
+			return x + y;
+		}
+		if (rank[x] < rank[y])
+		{
+			ch[x][1] = merge(ch[x][1], y);
+			pushup(x);
+			return x;
+		}
+		else
+		{
+			ch[y][0] = merge(x, ch[y][0]);
+			pushup(y);
+			return y;
+		}
+	}
+
+	std::pair<int, int> split(int x, int sz)
+	{
+		if (! x)
+		{
+			return std::make_pair(0, 0);
+		}
+		if (sz < size[ch[x][0]] + 1)
+		{
+			std::pair<int, int> tmp = split(ch[x][0], sz);
+			ch[x][0] = tmp.second;
+			pushup(x);
+			return std::make_pair(tmp.first, x);
+		}
+		else
+		{
+			std::pair<int, int> tmp = split(ch[x][1], sz - size[ch[x][0]] - 1);
+			ch[x][1] = tmp.first;
+			pushup(x);
+			return std::make_pair(x, tmp.second);
+		}
+	}
+
+	int find(int sz)
+	{
+		int x = root;
+		while (size[ch[x][0]] + 1 != sz)
+		{
+			if (sz < size[ch[x][0]] + 1)
+			{
+				x = ch[x][0];
+			}
+			else
+			{
+				sz -= size[ch[x][0]] + 1;
+				x = ch[x][1];
+			}
+		}
+		return x;
+	}
+
+	void insert(int key)
+	{
+		int k = get(key);
+		std::pair<int, int> tmp = split(root, k);
+		root = merge(tmp.first, merge(newnode(key), tmp.second));
+	}
+	
+	void erase(int key)
+	{
+		int k = get(key);
+		std::pair<int, int> tmp = split(root, k);
+		root = merge(tmp.first, split(tmp.second, 1).second);
+	}
 }
 
 int main()
 {
+#ifdef debug
+	freopen("3224.in", "r", stdin);
+#endif
+	srand(time(NULL));
 	scanf("%d", &n);
-	for (int i = 1; i <= n; i++)
+	while (n--)
 	{
-		int cas;
-		scanf("%d", &cas);
+		int cas = read();
 		if (cas == 1)
 		{
-			int x;
-			scanf("%d", &x);
-			insert(x);
+			treap::insert(read());
 		}
 		if (cas == 2)
 		{
-			int x;
-			scanf("%d", &x);
-			deletex(x);
+			treap::erase(read());
 		}
 		if (cas == 3)
 		{
-			int x;
-			scanf("%d", &x);
-			printf("%d\n", getkthfirst(root, x));
+			printf("%d\n", treap::get(read()) + 1);
 		}
 		if (cas == 4)
 		{
-			int x;
-			scanf("%d", &x);
-			printf("%d\n", findkth(root, x));
+			printf("%d\n", treap::tree[treap::find(read())]);
 		}
 		if (cas == 5)
 		{
-			int x;
-			scanf("%d", &x);
-			printf("%d\n", findkth(root, getkthfirst(root, x) - 1));
+			printf("%d\n", treap::tree[treap::find(treap::get(read()))]);
 		}
 		if (cas == 6)
 		{
-			int x;
-			scanf("%d", &x);
-			printf("%d\n", findkth(root, getkthlast(root, x) + 1));
+			printf("%d\n", treap::tree[treap::find(treap::get(read() + 1) + 1)]);
 		}
 	}
 	return 0;
 }
+
