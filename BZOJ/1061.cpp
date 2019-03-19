@@ -1,95 +1,91 @@
 #include <cstdio>
-#include <algorithm>
-#include <cstring>
 #include <queue>
 
-const int INF = 1e9;
-int edgenum;
-int vet[200000];
-int cap[200000];
-int val[200000];
-int nextx[200000];
-int head[2000];
-int dis[2000];
-int inque[2000];
-int pre[2000];
-int preedge[2000];
-int n, m;
-int l[20000], r[20000], w[20000];
-int x[2000];
-int s, t;
-int T;
-std::queue<int> que;
+long long read()
+{
+	char last = '+', ch = getchar();
+	while (ch < '0' || ch > '9') last = ch, ch = getchar();
+	long long tmp = 0;
+	while (ch >= '0' && ch <= '9') tmp = tmp * 10 + ch - 48, ch = getchar();
+	if (last == '-') tmp = -tmp;
+	return tmp;
+}
 
-void add(int u, int v, int c, double cost)
+const int INF = 1000000000;
+const int _n = 1000 + 10, _m = 10000 + 10;
+int n, m;
+int x[_n];
+int edgenum;
+int vet[4 * _n + 2 * _m], cap[4 * _n + 2 * _m], val[4 * _n + 2 * _m], nextx[4 * _n + 2 * _m], head[_n];
+int S, T;
+std::queue<int> que;
+int dis[_n], inque[_n], pre[_n], preedge[_n];
+
+void add(int u, int v, int lim, int cost)
 {
 	edgenum++;
 	vet[edgenum] = v;
-	cap[edgenum] = c;
+	cap[edgenum] = lim;
 	val[edgenum] = cost;
 	nextx[edgenum] = head[u];
 	head[u] = edgenum;
 }
 
-bool SPFA(int s, int t)
+bool SPFA(int S, int T)
 {
-	for (int i = 1; i <= n + 3; i++)
+	for (int i = 1; i <= n + 4; i++)
 	{
 		dis[i] = INF;
 		inque[i] = 0;
 		pre[i] = 0;
 		preedge[i] = 0;
 	}
-	que.push(s);
-	inque[s] = true;
-	dis[s] = 0;
+	dis[S] = 0;
+	que.push(S);
 	while (! que.empty())
 	{
 		int u = que.front();
 		que.pop();
+		inque[u] = 0;
 		for (int i = head[u]; i; i = nextx[i])
 		{
 			int v = vet[i];
-			int c = cap[i];
-			double cost = val[i];
-			if (c)
+			int lim = cap[i];
+			int cost = val[i];
+			if (lim && dis[u] + cost < dis[v])
 			{
-				if (dis[u] + cost < dis[v])
+				dis[v] = dis[u] + cost;
+				preedge[v] = i;
+				pre[v] = u;
+				if (! inque[v])
 				{
-					dis[v] = dis[u] + cost;
-					pre[v] = u;
-					preedge[v] = i;
-					if (! inque[v])
-					{
-						que.push(v);
-						inque[v] = true;
-					}
+					que.push(v);
+					inque[v] = 1;
 				}
 			}
 		}
-		inque[u] = false;
 	}
-	return pre[t] != 0;
+	return pre[T] != 0;
 }
 
-int maxflow(int s, int t)
+int maxflow(int S, int T)
 {
 	int ans = 0;
-	while (SPFA(s, t))
+	while (SPFA(S, T))
 	{
 		int minx = INF;
-		int now = t;
-		while (now != s)
+		int now = T;
+		while (now != S)
 		{
 			minx = std::min(minx, cap[preedge[now]]);
 			now = pre[now];
 		}
-		now = t;
-		while (now != s)
+		now = T;
+		while (now != S)
 		{
 			cap[preedge[now]] -= minx;
 			cap[preedge[now] ^ 1] += minx;
-			ans += val[preedge[now]] * minx;
+			ans += minx * val[preedge[now]];
 			now = pre[now];
 		}
 	}
@@ -98,43 +94,41 @@ int maxflow(int s, int t)
 
 int main()
 {
-	while (scanf("%d%d", &n, &m) == 2)
+	edgenum = 1;
+	scanf("%d%d", &n, &m);
+	S = n + 3;
+	T = n + 4;
+	for (int i = 1; i <= n; i++)
 	{
-		edgenum = 1;
-		memset(head, 0, sizeof(head));
-		s = n + 2;
-		t = n + 3;
-		x[0] = x[n + 1] = 0;
-		for (int i = 1; i <= n; i++)
-		{
-			scanf("%d", &x[i]);
-		}
-		for (int i = 1; i <= n + 1; i++)
-		{
-			if (x[i] - x[i - 1] > 0)
-			{
-				add(s, i, x[i] - x[i - 1], 0);
-				add(i, s, 0, 0);
-			}
-			if (x[i] - x[i - 1] < 0)
-			{
-				add(i, t, x[i - 1] - x[i], 0);
-				add(t, i, 0, 0);
-			}
-		}
-		for (int i = 1; i <= m; i++)
-		{
-			scanf("%d%d%d", &l[i], &r[i], &w[i]);
-			add(l[i], r[i] + 1, INF, w[i]);
-			add(r[i] + 1, l[i], 0, -w[i]);
-		}
-		for (int i = 1; i <= n; i++)
-		{
-			add(i + 1, i, INF, 0);
-			add(i, i + 1, 0, 0);
-		}
-		printf("%d\n", maxflow(s, t));
+		add(i + 1, i + 2, INF, 0);
+		add(i + 2, i + 1, 0, 0);
 	}
+	for (int i = 1; i <= n; i++)
+	{
+		x[i] = read();
+	}
+	for (int i = 1; i <= n + 1; i++)
+	{
+		if (x[i] - x[i - 1] > 0)
+		{
+			add(i + 1, T, x[i] - x[i - 1], 0);
+			add(T, i + 1, 0, 0);
+		}
+		if (x[i] - x[i - 1] < 0)
+		{
+			add(S, i + 1, x[i - 1] - x[i], 0);
+			add(i + 1, S, 0, 0);
+		}
+	}
+	for (int i = 1; i <= m; i++)
+	{
+		int l, r, c;
+		l = read();
+		r = read();
+		c = read();
+		add(r + 2, l + 1, INF, c);
+		add(l + 1, r + 2, 0, -c);
+	}
+	printf("%d\n", maxflow(S, T));
 	return 0;
 }
-
