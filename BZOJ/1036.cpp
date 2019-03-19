@@ -1,216 +1,177 @@
 #include <cstdio>
 #include <algorithm>
- 
-using namespace std;
- 
-int edgenum;
-int vet[60005];
-int nextx[60005];
-int head[30005];
-int sz[30005];
-int deep[30005];
-int fa[30005];
-int last;
-int pos[30005];
-int top[30005];
-int maxx[70005];
-int sumx[70005];
-int ch[30005];
-char st[30];
-int M;
-int n;
-int x[30005];
-int q;
- 
-void add(int u, int v)
+
+long long read()
 {
-    edgenum++;
-    vet[edgenum] = v;
-    nextx[edgenum] = head[u];
-    head[u] = edgenum;
+	char last = '+', ch = getchar();
+	while (ch < '0' || ch > '9') last = ch, ch = getchar();
+	long long tmp = 0;
+	while (ch >= '0' && ch <= '9') tmp = tmp * 10 + ch - 48, ch = getchar();
+	if (last == '-') tmp = -tmp;
+	return tmp;
 }
- 
-void dfs1(int u)
+
+const int INF = 1000000000;
+const int _n = 30000 + 10;
+int n, m;
+int x[_n];
+int uuu[_n], vvv[_n];
+char cas[10];
+int ch[_n][2], sum[_n], maxx[_n], fa[_n], rev[_n];
+int top;
+int stack[_n];
+
+bool isroot(int k)
 {
-    sz[u] = 1;
-    int k = 0;
-    for (int i = head[u]; i; i = nextx[i])
-    {
-        int v = vet[i];
-        if (v != fa[u])
-        {
-            deep[v] = deep[u] + 1;
-            fa[v] = u;
-            dfs1(v);
-            sz[u] += sz[v];
-            if (sz[v] > sz[k])
-            {
-                k = v;
-            }
-        }
-    }
-    ch[u] = k;
+	return ch[fa[k]][0] != k && ch[fa[k]][1] != k;
 }
- 
-void dfs2(int u, int chain)
+
+void pushup(int k)
 {
-    last++;
-    pos[u] = last;
-    top[u] = chain;
-    if (ch[u] == 0)
-    {
-        return;
-    }
-    dfs2(ch[u], chain);
-    for (int i = head[u]; i; i = nextx[i])
-    {
-        int v = vet[i];
-        if (v != fa[u] && v != ch[u])
-        {
-            dfs2(v, v);
-        }
-    }
+	sum[k] = sum[ch[k][0]] + sum[ch[k][1]] + x[k];
+	maxx[k] = std::max(std::max(maxx[ch[k][0]], maxx[ch[k][1]]), x[k]);
 }
- 
-void update(int x, int newvalue)
+
+void pushdown(int k)
 {
-    x += M;
-    maxx[x] = newvalue;
-    sumx[x] = newvalue;
-    while (x > 1)
-    {
-        x >>= 1;
-        maxx[x] = max(maxx[x << 1], maxx[x << 1 | 1]);
-        sumx[x] = sumx[x << 1] + sumx[x << 1 | 1];
-    }
+	if (rev[k])
+	{
+		std::swap(ch[k][0], ch[k][1]);
+		rev[ch[k][0]] ^= 1;
+		rev[ch[k][1]] ^= 1;
+		rev[k] = 0;
+	}
 }
- 
-int query_max(int l, int r)
+
+void rotate(int x)
 {
-    int maxxx = -1000000000;
-    l = l + M - 1;
-    r = r + M + 1;
-    for (; l ^ r ^ 1; l >>= 1, r >>= 1)
-    {
-        if (~ l & 1)
-        {
-            maxxx = max(maxxx, maxx[l ^ 1]);
-        }
-        if (r & 1)
-        {
-            maxxx = max(maxxx, maxx[r ^ 1]);
-        }
-    }
-    return maxxx;
+	int y = fa[x];
+	int z = fa[y];
+	int w = ch[y][1] == x;
+	if (! isroot(y))
+	{
+		ch[z][ch[z][1] == y] = x;
+	}
+	fa[x] = z;
+	ch[y][w] = ch[x][w ^ 1];
+	fa[ch[y][w]] = y;
+	ch[x][w ^ 1] = y;
+	fa[y] = x;
+	pushup(y);
+	pushup(x);
 }
- 
-int query_sum(int l, int r)
+
+void splay(int x)
 {
-    int sum = 0;
-    l = l + M - 1;
-    r = r + M + 1;
-    for (; l ^ r ^ 1; l >>= 1, r >>= 1)
-    {
-        if (~ l & 1)
-        {
-            sum += sumx[l ^ 1];
-        }
-        if (r & 1)
-        {
-            sum += sumx[r ^ 1];
-        }
-    }
-    return sum;
+	top = 0;
+	top++;
+	stack[top] = x;
+	for (int i = x; ! isroot(i); i = fa[i])
+	{
+		top++;
+		stack[top] = fa[i];
+	}
+	while (top)
+	{
+		pushdown(stack[top]);
+		top--;
+	}
+	while (! isroot(x))
+	{
+		int y = fa[x];
+		int z = fa[y];
+		if (! isroot(y))
+		{
+			if ((ch[y][1] == x) ^ (ch[z][1] == y))
+			{
+				rotate(x);
+			}
+			else
+			{
+				rotate(y);
+			}
+		}
+		rotate(x);
+	}
 }
- 
-int solve_max(int xx, int yy)
+
+void access(int x)
 {
-    int maxxx = -1000000000;
-    while (top[xx] != top[yy])
-    {
-        if (deep[top[xx]] < deep[top[yy]])
-        {
-            swap(xx, yy);
-        }
-        maxxx = max(maxxx, query_max(pos[top[xx]], pos[xx]));
-        xx = fa[top[xx]];
-    }
-    if (pos[xx] > pos[yy])
-    {
-        swap(xx, yy);
-    }
-    maxxx = max(maxxx, query_max(pos[xx], pos[yy]));
-    return maxxx;
+	for (int t = 0; x; t = x, x = fa[x])
+	{
+		splay(x);
+		ch[x][1] = t;
+		pushup(x);
+	}
 }
- 
-int solve_sum(int xx, int yy)
+
+void makeroot(int x)
 {
-    int sum = 0;
-    while (top[xx] != top[yy])
-    {
-        if (deep[top[xx]] < deep[top[yy]])
-        {
-            swap(xx, yy);
-        }
-        sum += query_sum(pos[top[xx]], pos[xx]);
-        xx = fa[top[xx]];
-    }
-    if (pos[xx] > pos[yy])
-    {
-        swap(xx, yy);
-    }
-    sum += query_sum(pos[xx], pos[yy]);
-    return sum;
+	access(x);
+	splay(x);
+	rev[x] ^= 1;
 }
- 
+
+void link(int x, int y)
+{
+	makeroot(x);
+	fa[x] = y;
+}
+
+void split(int x, int y)
+{
+	makeroot(x);
+	access(y);
+	splay(y);
+}
+
 int main()
 {
-    edgenum = 0;
-    last = 0;
-    scanf("%d", &n);
-    for (int i = 1; i < n; i++)
-    {
-        int u, v;
-        scanf("%d%d", &u, &v);
-        add(u, v);
-        add(v, u);
-    }
-    for (int i = 1; i <= n; i++)
-    {
-        scanf("%d", &x[i]);
-    }
-    deep[1] = 0;
-    dfs1(1);
-    dfs2(1, 1);
-    M = 1;
-    for (; M < n + 2; M <<= 1);
-    for (int i = 1; i <= n; i++)
-    {
-        update(pos[i], x[i]);
-    }
-    scanf("%d", &q);
-    for (int i = 1; i <= q; i++)
-    {
-        scanf("%s", st);
-        if (st[0] == 'C')
-        {
-            int x, newvalue;
-            scanf("%d%d", &x, &newvalue);
-            update(pos[x], newvalue);
-        }
-        else
-        {
-            int xx, yy;
-            scanf("%d%d", &xx, &yy);
-            if (st[1] == 'M')
-            {
-                printf("%d\n", solve_max(xx, yy));
-            }
-            else
-            {
-                printf("%d\n", solve_sum(xx, yy));
-            }
-        }
-    }
-    return 0;
+#ifdef debug
+	freopen("1036.in", "r", stdin);
+#endif
+	maxx[0] = -INF;
+	sum[0] = 0;
+	scanf("%d", &n);
+	for (int i = 1; i < n; i++)
+	{
+		uuu[i] = read();
+		vvv[i] = read();
+	}
+	for (int i = 1; i <= n; i++)
+	{
+		scanf("%d", &x[i]);
+	}
+	for (int i = 1; i < n; i++)
+	{
+		link(uuu[i], vvv[i]);
+	}
+	scanf("%d", &m);
+	while (m--)
+	{
+		scanf("%s", cas + 1);
+		if (cas[1] == 'C')
+		{
+			int pos = read();
+			int newvalue = read();
+			splay(pos);
+			x[pos] = newvalue;
+			pushup(pos);
+		}
+		if (cas[2] == 'M')
+		{
+			int u = read();
+			int v = read();
+			split(u, v);
+			printf("%d\n", maxx[v]);
+		}
+		if (cas[2] == 'S')
+		{
+			int u = read();
+			int v = read();
+			split(u, v);
+			printf("%d\n", sum[v]);
+		}
+	}
+	return 0;
 }
