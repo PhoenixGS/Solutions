@@ -1,28 +1,17 @@
 #include <cstdio>
 #include <algorithm>
 
-long long read()
-{
-	char last = '+', ch = getchar();
-	while (ch < '0' || ch > '9') last = ch, ch = getchar();
-	long long tmp = 0;
-	while (ch >= '0' && ch <= '9') tmp = tmp * 10 + ch - 48, ch = getchar();
-	if (last == '-') tmp = -tmp;
-	return tmp;
-}
-
-const int M = 998244353;
-const int G = 3;
+const int M = 998244353, G = 3;
 const int _n = 100000 + 10;
 int n;
-int x[4 * _n];
-int ans[4 * _n];
-int xx[4 * _n], yy[4 * _n];
-int rev[4 * _n];
+int x[6 * _n], y[6 * _n];
+int N, bit;
+int rev[6 * _n];
+int xx[6 * _n], yy[6 * _n];
 
 int pow_mod(int x, int p, int M)
 {
-	p = (p % (M - 1) + (M - 1)) % (M - 1);
+	p = (p % (M - 1) + M - 1) % (M - 1);
 	int ans = 1;
 	int tmp = x;
 	while (p)
@@ -39,16 +28,15 @@ int pow_mod(int x, int p, int M)
 
 void getrev(int bit)
 {
-	for (int i = 0; i < (1 << bit); i++)
+	rev[0] = 0;
+	for (int i = 1; i < (1 << bit); i++)
 	{
-		rev[i] = rev[i >> 1] >> 1 | ((i & 1) << (bit - 1));
+		rev[i] = (rev[i >> 1] >> 1) | ((i & 1) << (bit - 1));
 	}
 }
 
-void NTT(int *x, int bit, int cas)
+void NTT(int *x, int n, int cas)
 {
-	int n = (1 << bit);
-
 	for (int i = 0; i < n; i++)
 	{
 		if (i < rev[i])
@@ -56,14 +44,12 @@ void NTT(int *x, int bit, int cas)
 			std::swap(x[i], x[rev[i]]);
 		}
 	}
-
 	for (int i = 1; i < n; i <<= 1)
 	{
 		int wn = pow_mod(G, cas * (M - 1) / (i << 1), M);
 		for (int j = 0; j < n; j += (i << 1))
 		{
-			int w = 1;
-			for (int k = 0; k < i; k++, w = (long long)w * wn % M)
+			for (int k = 0, w = 1; k < i; k++, w = (long long)w * wn % M)
 			{
 				int xx = x[j + k];
 				int yy = (long long)w * x[j + k + i] % M;
@@ -72,7 +58,6 @@ void NTT(int *x, int bit, int cas)
 			}
 		}
 	}
-	
 	if (cas == -1)
 	{
 		int invn = pow_mod(n, M - 2, M);
@@ -87,23 +72,18 @@ void solve(int n)
 {
 	if (n == 1)
 	{
-		ans[0] = 1 * pow_mod(x[0], M - 2, M);
-//		printf("#%d\n%d\n", 1, ans[0]);
+		y[0] = pow_mod(x[0], M - 2, M);
 		return;
 	}
-
-	solve((n + 1) >> 1);
-
-//	printf("#%d\n", n);
-
-	int nn = 1, bit = 0;
-	while (nn <= 2 * n)
+	solve((n + 1) / 2);
+	N = 1;
+	bit = 0;
+	while (N < 3 * n)
 	{
-		nn <<= 1;
+		N <<= 1;
 		bit++;
 	}
-
-	for (int i = 0; i < nn; i++)
+	for (int i = 0; i < N; i++)
 	{
 		xx[i] = yy[i] = 0;
 	}
@@ -111,62 +91,35 @@ void solve(int n)
 	{
 		xx[i] = x[i];
 	}
-	for (int i = 0; i < ((n + 1) >> 1); i++)
+	for (int i = 0; i < (n + 1) / 2; i++)
 	{
-		yy[i] = ans[i];
+		yy[i] = y[i];
 	}
-
-/*	for (int i = 0; i < nn; i++)
-	{
-		printf("%d ", xx[i]);
-	}
-	puts("");*/
-
 	getrev(bit);
-
-/*	for (int i = 0; i < nn; i++)
+	NTT(xx, N, 1);
+	NTT(yy, N, 1);
+	for (int i = 0; i < N; i++)
 	{
-		printf("%d ", rev[i]);
-	}
-	puts("");*/
-
-	NTT(xx, bit, 1);
-	NTT(yy, bit, 1);
-	for (int i = 0; i < nn; i++)
-	{
-//		xx[i] = (long long)xx[i] * yy[i] % M * yy[i] % M;
 		xx[i] = (long long)xx[i] * yy[i] % M * yy[i] % M;
 	}
-	NTT(xx, bit, -1);
-/*	for (int i = 0; i < nn; i++)
-	{
-		printf("%d ", xx[i]);
-	}
-	puts("");*/
-
-
+	NTT(xx, N, -1);
 	for (int i = 0; i < n; i++)
 	{
-		ans[i] = ((long long)2 * ans[i] - xx[i] + M) % M;
+		y[i] = ((long long)2 * y[i] % M - xx[i]) % M;
 	}
-/*	for (int i = 0; i < n; i++)
-	{
-		printf("%d ", ans[i]);
-	}
-	puts("");*/
 }
 
 int main()
 {
-	n = read();
+	scanf("%d", &n);
 	for (int i = 0; i < n; i++)
 	{
-		x[i] = read();
+		scanf("%d", &x[i]);
 	}
 	solve(n);
 	for (int i = 0; i < n; i++)
 	{
-		printf("%d ", ans[i]);
+		printf("%d ", (y[i] + M) % M);
 	}
 	puts("");
 	return 0;
