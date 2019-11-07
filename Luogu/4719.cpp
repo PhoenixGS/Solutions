@@ -11,9 +11,14 @@ long long read()
 	return tmp;
 }
 
-struct Matrix
+struct matrix
 {
 	int x[2][2];
+
+	int * operator [] (int pos)
+	{
+		return x[pos];
+	}
 };
 
 const int INF = 1000000000;
@@ -22,11 +27,35 @@ int n, m;
 int x[_n];
 int edgenum;
 int vet[2 * _n], nextx[2 * _n], head[_n];
-Matrix tree[4 * _n];
+int fa[_n], deep[_n], size[_n];
 int times;
-int fa[_n], dfn[_n], size[_n];
-int top[_n], len[_n];
+int dfn[_n];
+int top[_n], down[_n];
 int g[_n][2];
+matrix tree[4 * _n];
+
+matrix operator * (matrix x, matrix y)
+{
+	matrix tmp;
+	for (int i = 0; i < 2; i++)
+	{
+		for (int j = 0; j < 2; j++)
+		{
+			tmp[i][j] = -INF;
+		}
+	}
+	for (int i = 0; i < 2; i++)
+	{
+		for (int j = 0; j < 2; j++)
+		{
+			for (int k = 0; k < 2; k++)
+			{
+				tmp[i][k] = std::max((long long)tmp[i][k], (long long)x[i][j] + y[j][k]);
+			}
+		}
+	}
+	return tmp;
+}
 
 void add(int u, int v)
 {
@@ -36,52 +65,31 @@ void add(int u, int v)
 	head[u] = edgenum;
 }
 
-Matrix operator * (const Matrix x, const Matrix y)
+void pushup(int k)
 {
-	Matrix tmp;
-	for (int i = 0; i < 2; i++)
-	{
-		for (int j = 0; j < 2; j++)
-		{
-			tmp.x[i][j] = -INF;
-		}
-	}
-	for (int i = 0; i < 2; i++)
-	{
-		for (int j = 0; j < 2; j++)
-		{
-			for (int k = 0; k < 2; k++)
-			{
-				tmp.x[i][k] = std::max((long long)tmp.x[i][k], (long long)x.x[i][j] + y.x[j][k]);
-			}
-		}
-	}
-	return tmp;
+	tree[k] = tree[k << 1] * tree[k << 1 | 1];
 }
 
-void change(int k, int l, int r, int pos, int g0, int g1)
+void change_(int k, int l, int r, int pos, matrix newvalue)
 {
 	if (l == r)
 	{
-		tree[k].x[0][0] = g0;
-		tree[k].x[0][1] = g0;
-		tree[k].x[1][0] = g1;
-		tree[k].x[1][1] = -INF;
+		tree[k] = newvalue;
 		return;
 	}
 	int mid = (l + r) >> 1;
 	if (pos <= mid)
 	{
-		change(k << 1, l, mid, pos, g0, g1);
+		change_(k << 1, l, mid, pos, newvalue);
 	}
 	else
 	{
-		change(k << 1 | 1, mid + 1, r, pos, g0, g1);
+		change_(k << 1 | 1, mid + 1, r, pos, newvalue);
 	}
-	tree[k] = tree[k << 1] * tree[k << 1 | 1];
+	pushup(k);
 }
 
-Matrix query(int k, int l, int r, int L, int R)
+matrix query_(int k, int l, int r, int L, int R)
 {
 	if (L <= l && r <= R)
 	{
@@ -90,86 +98,92 @@ Matrix query(int k, int l, int r, int L, int R)
 	int mid = (l + r) >> 1;
 	if (! (L <= mid))
 	{
-		return query(k << 1 | 1, mid + 1, r, L, R);
+		return query_(k << 1 | 1, mid + 1, r, L, R);
 	}
 	if (! (R > mid))
 	{
-		return query(k << 1, l, mid, L, R);
+		return query_(k << 1, l, mid, L, R);
 	}
-	return query(k << 1, l, mid, L, R) * query(k << 1 | 1, mid + 1, r, L, R);
+	return query_(k << 1, l, mid, L, R) * query_(k << 1 | 1, mid + 1, r, L, R);
 }
 
 void dfs(int u, int father)
 {
-	fa[u] = father;
 	size[u] = 1;
+	fa[u] = father;
 	for (int i = head[u]; i; i = nextx[i])
 	{
 		int v = vet[i];
 		if (v != father)
 		{
+			deep[v] = deep[u] + 1;
 			dfs(v, u);
 			size[u] += size[v];
 		}
 	}
 }
 
-void dfs2(int u, int chain)
+void dfs2(int u, int father, int chain)
 {
-	g[u][0] = 0;
-	g[u][1] = x[u];
-	len[chain]++;
-	top[u] = chain;
 	times++;
 	dfn[u] = times;
-	int ch = 0;
+	top[u] = chain;
+	down[chain] = u;
+	int k = 0;
 	for (int i = head[u]; i; i = nextx[i])
 	{
 		int v = vet[i];
-		if (v != fa[u])
+		if (v != father && size[v] > size[k])
 		{
-			if (size[v] > size[ch])
-			{
-				ch = v;
-			}
+			k = v;
 		}
 	}
-	if (ch)
+	if (k != 0)
 	{
-		dfs2(ch, chain);
+		dfs2(k, u, chain);
 	}
+	g[u][0] = 0;
+	g[u][1] = x[u];
 	for (int i = head[u]; i; i = nextx[i])
 	{
 		int v = vet[i];
-		if (v != fa[u] && v != ch)
+		if (v != father && v != k)
 		{
-			dfs2(v, v);
-			Matrix tmp = query(1, 1, n, dfn[v], dfn[v] + len[v] - 1);
-			g[u][0] += std::max(0, std::max(tmp.x[0][0], tmp.x[1][0]));
-			g[u][1] += std::max(0, tmp.x[0][0]);
+			dfs2(v, u, v);
+			matrix z = query_(1, 1, n, dfn[v], dfn[down[v]]);
+			g[u][0] = g[u][0] + std::max(z[0][0], z[1][0]);
+			g[u][1] = g[u][1] + z[0][0];
 		}
 	}
-	change(1, 1, n, dfn[u], g[u][0], g[u][1]);
+	matrix tmp;
+	tmp[0][0] = g[u][0];
+	tmp[0][1] = g[u][0];
+	tmp[1][0] = g[u][1];
+	tmp[1][1] = -INF;
+	change_(1, 1, n, dfn[u], tmp);
 }
 
-void solve(int u, int newvalue)
+void change(int u, int newvalue)
 {
-	for (int i = top[u]; fa[i]; i = top[fa[i]])
-	{
-		Matrix tmp = query(1, 1, n, dfn[i], dfn[i] + len[i] - 1);
-		g[fa[i]][0] -= std::max(0, std::max(tmp.x[0][0], tmp.x[1][0]));
-		g[fa[i]][1] -= std::max(0, tmp.x[0][0]);
-	}
 	g[u][1] -= x[u];
 	x[u] = newvalue;
 	g[u][1] += x[u];
-	change(1, 1, n, dfn[u], g[u][0], g[u][1]);
-	for (int i = top[u]; fa[i]; i = top[fa[i]])
+	while (u)
 	{
-		Matrix tmp = query(1, 1, n, dfn[i], dfn[i] + len[i] - 1);
-		g[fa[i]][0] += std::max(0, std::max(tmp.x[0][0], tmp.x[1][0]));
-		g[fa[i]][1] += std::max(0, tmp.x[0][0]);
-		change(1, 1, n, dfn[fa[i]], g[fa[i]][0], g[fa[i]][1]);
+		int chain = top[u];
+		matrix z = query_(1, 1, n, dfn[chain], dfn[down[chain]]);
+		g[fa[chain]][0] -= std::max(z[0][0], z[1][0]);
+		g[fa[chain]][1] -= z[0][0];
+		matrix tmp;
+		tmp[0][0] = g[u][0];
+		tmp[0][1] = g[u][0];
+		tmp[1][0] = g[u][1];
+		tmp[1][1] = -INF;
+		change_(1, 1, n, dfn[u], tmp);
+		z = query_(1, 1, n, dfn[chain], dfn[down[chain]]);
+		g[fa[chain]][0] += std::max(z[0][0], z[1][0]);
+		g[fa[chain]][1] += z[0][0];
+		u = fa[chain];
 	}
 }
 
@@ -188,14 +202,14 @@ int main()
 		add(v, u);
 	}
 	dfs(1, 0);
-	dfs2(1, 1);
+	dfs2(1, 0, 1);
 	while (m--)
 	{
-		int x = read();
-		int newvalue = read();
-		solve(x, newvalue);
-		Matrix tmp = query(1, 1, n, dfn[1], dfn[1] + len[1] - 1);
-		printf("%d\n", std::max(tmp.x[0][0], tmp.x[1][0]));
+		int pos, newvalue;
+		scanf("%d%d", &pos, &newvalue);
+		change(pos, newvalue);
+		matrix z = query_(1, 1, n, 1, dfn[down[1]]);
+		printf("%d\n", std::max(z[0][0], z[1][0]));
 	}
 	return 0;
 }
