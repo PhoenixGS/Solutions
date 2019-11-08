@@ -29,7 +29,6 @@ int edgenum;
 int vet[2 * _n], nextx[2 * _n], head[_n];
 int g[_n][2];
 int fa[_n], ch[_n][2];
-int tag[_n];
 matrix sum[_n], mat[_n];
 int top;
 int stack[_n];
@@ -96,17 +95,6 @@ void pushup(int x)
 	sum[x] = sum[ch[x][0]] * mat[x] * sum[ch[x][1]];
 }
 
-void pushdown(int x)
-{
-	if (tag[x])
-	{
-		std::swap(ch[x][0], ch[x][1]);
-		tag[ch[x][0]] ^= 1;
-		tag[ch[x][1]] ^= 1;
-		tag[x] = 0;
-	}
-}
-
 void rotate(int x)
 {
 	int y = fa[x];
@@ -127,19 +115,6 @@ void rotate(int x)
 
 void splay(int x)
 {
-	top = 0;
-	top++;
-	stack[top] = x;
-	for (int i = x; ! isroot(i); i = fa[i])
-	{
-		top++;
-		stack[top] = fa[i];
-	}
-	while (top)
-	{
-		pushdown(stack[top]);
-		top--;
-	}
 	while (! isroot(x))
 	{
 		int y = fa[x];
@@ -187,7 +162,6 @@ void makeroot(int x)
 {
 	access(x);
 	splay(x);
-	tag[x] ^= 1;
 }
 
 int main()
