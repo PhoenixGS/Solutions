@@ -1,4 +1,6 @@
 #include <cstdio>
+#include <cstdlib>
+#include <ctime>
 #include <algorithm>
 
 long long read()
@@ -14,14 +16,15 @@ long long read()
 const int _n = 100000 + 10;
 int n;
 
-struct Treap
+namespace treap
 {
-	int knum, root;
-	int size[_n], tree[_n], rank[_n], ch[_n][2];
+	int root;
+	int knum;
+	int tree[_n], size[_n], rank[_n], ch[_n][2];
 
-	int randx()
+	inline int randx()
 	{
-		return ((rand() << 16) + rand());
+		return (rand() << 16) + rand();
 	}
 
 	void pushup(int k)
@@ -36,6 +39,17 @@ struct Treap
 		tree[knum] = key;
 		rank[knum] = randx();
 		return knum;
+	}
+
+	void print(int x)
+	{
+		if (! x)
+		{
+			return;
+		}
+		print(ch[x][0]);
+		printf("%d ", tree[x]);
+		print(ch[x][1]);
 	}
 
 	int get(int key)
@@ -57,27 +71,9 @@ struct Treap
 		return ans;
 	}
 
-	int find(int rk)
-	{
-		int now = root;
-		while (size[ch[now][0]] + 1 != rk)
-		{
-			if (rk <= size[ch[now][0]])
-			{
-				now = ch[now][0];
-			}
-			else
-			{
-				rk -= size[ch[now][0]] + 1;
-				now = ch[now][1];
-			}
-		}
-		return now;
-	}
-
 	int merge(int x, int y)
 	{
-		if (! x || ! y)
+		if (x == 0 || y == 0)
 		{
 			return x + y;
 		}
@@ -95,73 +91,94 @@ struct Treap
 		}
 	}
 
-	std::pair<int, int> split(int x, int k)
+	std::pair<int, int> split(int x, int sz)
 	{
 		if (! x)
 		{
 			return std::make_pair(0, 0);
 		}
-		if (k <= size[ch[x][0]])
+		if (sz < size[ch[x][0]] + 1)
 		{
-			std::pair<int, int> tmp = split(ch[x][0], k);
+			std::pair<int, int> tmp = split(ch[x][0], sz);
 			ch[x][0] = tmp.second;
 			pushup(x);
 			return std::make_pair(tmp.first, x);
 		}
 		else
 		{
-			std::pair<int, int> tmp = split(ch[x][1], k - size[ch[x][0]] - 1);
+			std::pair<int, int> tmp = split(ch[x][1], sz - size[ch[x][0]] - 1);
 			ch[x][1] = tmp.first;
 			pushup(x);
 			return std::make_pair(x, tmp.second);
 		}
 	}
 
-	void insert(int key)
+	int find(int sz)
 	{
-		int cnt = get(key);
-		std::pair<int, int> tmp = split(root, cnt);
-		root = merge(tmp.first, merge(newnode(key), tmp.second));
+		int x = root;
+		while (size[ch[x][0]] + 1 != sz)
+		{
+			if (sz < size[ch[x][0]] + 1)
+			{
+				x = ch[x][0];
+			}
+			else
+			{
+				sz -= size[ch[x][0]] + 1;
+				x = ch[x][1];
+			}
+		}
+		return x;
 	}
 
-	void del(int key)
+	void insert(int key)
 	{
-		int cnt = get(key);
-		std::pair<int, int> tmp = split(root, cnt);
+		int k = get(key);
+		std::pair<int, int> tmp = split(root, k);
+		root = merge(tmp.first, merge(newnode(key), tmp.second));
+	}
+	
+	void erase(int key)
+	{
+		int k = get(key);
+		std::pair<int, int> tmp = split(root, k);
 		root = merge(tmp.first, split(tmp.second, 1).second);
 	}
-}treap;
+}
 
 int main()
 {
+#ifdef debug
+	freopen("3369.in", "r", stdin);
+#endif
+	srand(time(NULL));
 	scanf("%d", &n);
 	while (n--)
 	{
-		int op;
-		scanf("%d", &op);
-		if (op == 1)
+		int cas = read();
+		if (cas == 1)
 		{
-			treap.insert(read());
+			treap::insert(read());
 		}
-		if (op == 2)
+		if (cas == 2)
 		{
-			treap.del(read());
+			treap::erase(read());
 		}
-		if (op == 3)
+		if (cas == 3)
 		{
-			printf("%d\n", treap.get(read()) + 1);
+			printf("%d\n", treap::get(read()) + 1);
 		}
-		if (op == 4)
+		if (cas == 4)
 		{
-			printf("%d\n", treap.tree[treap.find(read())]);
+			printf("%d\n", treap::tree[treap::find(read())]);
 		}
-		if (op == 5)
+		if (cas == 5)
 		{
-			printf("%d\n", treap.tree[treap.find(treap.get(read()))]);
+			printf("%d\n", treap::tree[treap::find(treap::get(read()))]);
 		}
-		if (op == 6)
+		if (cas == 6)
 		{
-			printf("%d\n", treap.tree[treap.find(treap.get(read() + 1) + 1)]);
+			printf("%d\n", treap::tree[treap::find(treap::get(read() + 1) + 1)]);
 		}
 	}
 	return 0;
