@@ -25,7 +25,7 @@ int query(int k, int l, int r, int pos)
 {
 	if (l == r)
 	{
-		return tree[k];
+		return k;
 	}
 	int mid = (l + r) >> 1;
 	if (pos <= mid)
@@ -35,23 +35,6 @@ int query(int k, int l, int r, int pos)
 	else
 	{
 		return query(ch[k][1], mid + 1, r, pos);
-	}
-}
-
-int querys(int k, int l, int r, int pos)
-{
-	if (l == r)
-	{
-		return size[k];
-	}
-	int mid = (l + r) >> 1;
-	if (pos <= mid)
-	{
-		return querys(ch[k][0], l, mid, pos);
-	}
-	else
-	{
-		return querys(ch[k][1], mid + 1, r, pos);
 	}
 }
 
@@ -106,7 +89,7 @@ void changes(int &k, int l, int r, int pos)
 int findfather(int idx, int x)
 {
 	int k = query(root[idx], 1, n, x);
-	return k == x ? x : findfather(idx, k);
+	return tree[k] == x ? k : findfather(idx, tree[k]);
 }
 
 int main()
@@ -124,18 +107,21 @@ int main()
 			root[i] = root[i - 1];
 			int xx = findfather(i, x);
 			int yy = findfather(i, y);
-			int xs = querys(root[i], 1, n, xx);
-			int ys = querys(root[i], 1, n, yy);
-			if (xs < ys)
+			if (tree[xx] != tree[yy])
 			{
-				change(root[i], 1, n, xx, yy);
-			}
-			else
-			{
-				change(root[i], 1, n, yy, xx);
-				if (xs == ys)
+				int xs = size[xx];
+				int ys = size[yy];
+				if (xs < ys)
 				{
-					changes(root[i], 1, n, xx);
+					change(root[i], 1, n, tree[xx], tree[yy]);
+				}
+				else
+				{
+					change(root[i], 1, n, tree[yy], tree[xx]);
+					if (xs == ys)
+					{
+						changes(root[i], 1, n, tree[xx]);
+					}
 				}
 			}
 		}
