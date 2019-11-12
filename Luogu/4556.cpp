@@ -1,7 +1,7 @@
 #include <cstdio>
 #include <vector>
 
-const int _n = 100000;
+const int _n = 100000 + 10;
 int n, m;
 int edgenum;
 int vet[2 * _n], nextx[2 * _n], head[_n];
