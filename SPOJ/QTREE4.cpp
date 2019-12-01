@@ -301,7 +301,7 @@ int main()
 	edgenum = 1;
 	scanf("%d", &n);
 	z[1] = 0;
-	for (int i = 1; i <= 2 * n - 1; i++)
+	for (int i = 2; i <= 2 * n - 1; i++)
 	{
 		z[i] = z[i >> 1] + 1;
 	}
@@ -320,7 +320,7 @@ int main()
 	}
 	for (int j = 1; (1 << j) <= 2 * n - 1; j++)
 	{
-		for (int i = 1; i + (1 << j) <= 2 * n - 1; j++)
+		for (int i = 1; i + (1 << j) <= 2 * n - 1; i++)
 		{
 			if (deep[st[i][j - 1]] < deep[st[i + (1 << (j - 1))][j - 1]])
 			{
