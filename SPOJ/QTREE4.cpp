@@ -12,6 +12,21 @@ long long read()
 	return tmp;
 }
 
+const int _n = 100000 + 10;
+const int INF = 1000000000;
+int n, q;
+char s[20];
+int col[_n];
+int times;
+int dfn[_n];
+int pos[2 * _n];
+int edgenum;
+int vet[2 * _n], val[2 * _n], nextx[2 * _n], head[_n];
+int deep[_n], dist[_n];
+int root, S;
+int f[_n], size[_n];
+int vis[_n], ff[_n], tag[_n];
+
 struct HEAP
 {
 	std::priority_queue<int> A, B;
@@ -57,23 +72,64 @@ struct HEAP
 	}
 };
 
-const int INF = 1000000000;
-const int _n = 100000 + 10;
-int n, q;
-int z[2 * _n];
-char s[20];
-int col[_n];
-int times;
-int dfn[_n];
-int pos[2 * _n];
-int st[2 * _n][22];
-int edgenum;
-int vet[2 * _n], val[2 * _n], nextx[2 * _n], head[_n];
+struct ST
+{
+	int z[2 * _n];
+	int st[2 * _n][22];
+
+	int mx(int x, int y)
+	{
+		return deep[x] < deep[y] ? x : y;
+	}
+
+	void init()
+	{
+		z[1] = 0;
+		for (int i = 2; i <= 2 * n - 1; i++)
+		{
+			z[i] = z[i >> 1] + 1;
+		}
+		for (int i = 1; i <= 2 * n - 1; i++)
+		{
+			st[i][0] = pos[i];
+		}
+		for (int j = 1; (1 << j) <= 2 * n - 1; j++)
+		{
+			for (int i = 1; i + (1 << j) <= 2 * n - 1; i++)
+			{
+				if (deep[st[i][j - 1]] < deep[st[i + (1 << (j - 1))][j - 1]])
+				{
+					st[i][j] = st[i][j - 1];
+				}
+				else
+				{
+					st[i][j] = st[i + (1 << (j - 1))][j - 1];
+				}
+			}
+		}
+	}
+
+	int query_lca(int x, int y)
+	{
+		int l = dfn[x], r = dfn[y];
+		if (l > r)
+		{
+			std::swap(l, r);
+		}
+		int k = z[r - l + 1];
+		if (deep[st[l][k]] < deep[st[r - (1 << k) + 1][k]])
+		{
+			return st[l][k];
+		}
+		else
+		{
+			return st[r - (1 << k) + 1][k];
+		}
+	}
+};
+
 HEAP heap[_n], maxx[_n], ans;
-int deep[_n], dist[_n];
-int root, S;
-int f[_n], size[_n];
-int vis[_n], ff[_n], tag[_n];
+ST st;
 
 void add(int u, int v, int cost)
 {
@@ -104,27 +160,9 @@ void dfs(int u, int father)
 	}
 }
 
-int query_lca(int x, int y)
-{
-	int l = dfn[x], r = dfn[y];
-	if (l > r)
-	{
-		std::swap(l, r);
-	}
-	int k = z[r - l + 1];
-	if (deep[st[l][k]] < deep[st[r - (1 << k) + 1][k]])
-	{
-		return st[l][k];
-	}
-	else
-	{
-		return st[r - (1 << k) + 1][k];
-	}
-}
-
 int dis(int x, int y)
 {
-	int lca = query_lca(x, y);
+	int lca = st.query_lca(x, y);
 	return dist[x] + dist[y] - 2 * dist[lca];
 }
 
@@ -268,11 +306,6 @@ int main()
 #endif
 	edgenum = 1;
 	scanf("%d", &n);
-	z[1] = 0;
-	for (int i = 2; i <= 2 * n - 1; i++)
-	{
-		z[i] = z[i >> 1] + 1;
-	}
 	for (int i = 1; i < n; i++)
 	{
 		int u = read();
@@ -282,24 +315,7 @@ int main()
 		add(v, u, cost);
 	}
 	dfs(1, 0);
-	for (int i = 1; i <= 2 * n - 1; i++)
-	{
-		st[i][0] = pos[i];
-	}
-	for (int j = 1; (1 << j) <= 2 * n - 1; j++)
-	{
-		for (int i = 1; i + (1 << j) <= 2 * n - 1; i++)
-		{
-			if (deep[st[i][j - 1]] < deep[st[i + (1 << (j - 1))][j - 1]])
-			{
-				st[i][j] = st[i][j - 1];
-			}
-			else
-			{
-				st[i][j] = st[i + (1 << (j - 1))][j - 1];
-			}
-		}
-	}
+	st.init();
 	f[0] = INF;
 	root = 0;
 	S = n;
