@@ -70,7 +70,6 @@ int st[2 * _n][22];
 int edgenum;
 int vet[2 * _n], val[2 * _n], nextx[2 * _n], head[_n];
 HEAP heap[_n], maxx[_n], ans;
-int fa[_n][22];
 int deep[_n], dist[_n];
 int root, S;
 int f[_n], size[_n];
@@ -90,11 +89,6 @@ void dfs(int u, int father)
 	times++;
 	dfn[u] = times;
 	pos[times] = u;
-	fa[u][0] = father;
-	for (int i = 1; i <= 20; i++)
-	{
-		fa[u][i] = fa[fa[u][i - 1]][i - 1];
-	}
 	for (int i = head[u]; i; i = nextx[i])
 	{
 		int v = vet[i];
@@ -126,32 +120,6 @@ int query_lca(int x, int y)
 	{
 		return st[r - (1 << k) + 1][k];
 	}
-	/*
-	if (deep[x] < deep[y])
-	{
-		std::swap(x, y);
-	}
-	for (int i = 0; i <= 20; i++)
-	{
-		if ((1 << i) & (deep[x] - deep[y]))
-		{
-			x = fa[x][i];
-		}
-	}
-	if (x == y)
-	{
-		return x;
-	}
-	for (int i = 20; i >= 0; i--)
-	{
-		if (fa[x][i] != fa[y][i])
-		{
-			x = fa[x][i];
-			y = fa[y][i];
-		}
-	}
-	return fa[x][0];
-	*/
 }
 
 int dis(int x, int y)
