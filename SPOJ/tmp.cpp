@@ -1,211 +1,114 @@
-// Code by KSkun, 2018/3
-#include <cstdio>
-#include <cstring>
-
-#include <vector>
-#include <algorithm>
-#include <queue>
-
-typedef long long LL;
-
-inline char fgc() {
-    static char buf[100000], *p1 = buf, *p2 = buf;
-    return p1 == p2 && (p2 = (p1 = buf) + fread(buf, 1, 100000, stdin), p1 == p2) ? EOF : *p1++;
+//minamoto
+#include<bits/stdc++.h>
+#define inf 0x3f3f3f3f
+using namespace std;
+#define getc() (p1==p2&&(p2=(p1=buf)+fread(buf,1,1<<21,stdin),p1==p2)?EOF:*p1++)
+char buf[1<<21],*p1=buf,*p2=buf;
+inline int read(){
+    #define num ch-'0'
+    char ch;bool flag=0;int res;
+    while(!isdigit(ch=getc()))
+    (ch=='-')&&(flag=true);
+    for(res=num;isdigit(ch=getc());res=res*10+num);
+    (flag)&&(res=-res);
+    #undef num
+    return res;
 }
-
-inline LL readint() {
-    register LL res = 0, neg = 1;
-    register char c = fgc();
-    while(c < '0' || c > '9') {
-        if(c == '-') neg = -1;
-        c = fgc();
+char obuf[1<<24],*o=obuf;
+inline void print(int x){
+    if(x>9) print(x/10);
+    *o++=x%10+48;
+}
+const int N=100005;
+int ver[N<<1],head[N],Next[N<<1];
+int rev[N],fa[N],ch[N][2],w[N],col[N],lmn[N],rmn[N],len[N],val[N];
+multiset<int> s[N];
+int n,q,white=0,tot;
+#define ls ch[x][0]
+#define rs ch[x][1]
+inline int fir(multiset<int> &s){return s.size()?*s.begin():inf;}
+inline int min(int x,int y,int z){return min(x,min(y,z));}
+inline bool add(int u,int v){ver[++tot]=v,Next[tot]=head[u],head[u]=tot;}
+inline bool isroot(int x){return ch[fa[x]][0]!=x&&ch[fa[x]][1]!=x;}
+inline void init(){for(int i=0;i<=n;++i) lmn[i]=rmn[i]=w[i]=inf;}
+inline void pushr(int x){
+    rev[x]^=1,swap(ls,rs),swap(lmn[x],rmn[x]);
+}
+inline void pushup(int x){
+    if(!x) return;
+    len[x]=len[ls]+len[rs]+val[x];
+    lmn[x]=min(lmn[ls],len[ls]+val[x]+min(w[x],fir(s[x]),lmn[rs]));
+    rmn[x]=min(rmn[rs],len[rs]+min(w[x],fir(s[x]),rmn[ls]+val[x]));
+}
+inline void pushdown(int x){
+    if(x&&rev[x]){
+        pushr(ls),pushr(rs),rev[x]=0;
     }
-    while(c >= '0' && c <= '9') {
-        res = res * 10 + c - '0';
-        c = fgc();
+}
+void rotate(int x){
+    int y=fa[x],z=fa[y],d=ch[y][1]==x;
+    if(!isroot(y)) ch[z][ch[z][1]==y]=x;
+    fa[x]=z,fa[y]=x,fa[ch[x][d^1]]=y,ch[y][d]=ch[x][d^1],ch[x][d^1]=y,pushup(y);
+}
+void down(int x){
+    if(!isroot(x)) down(fa[x]);
+    pushdown(x);
+}
+void splay(int x){
+    down(x);
+    for(int y=fa[x],z=fa[y];!isroot(x);y=fa[x],z=fa[y]){
+        if(!isroot(y))
+        ((ch[z][1]==y)^(ch[y][1]==x))?rotate(x):rotate(y);
+        rotate(x);
     }
-    return res * neg;
+    pushup(x);
 }
-
-inline bool isop(char c) {
-    return c == 'A' || c == 'C';
+void access(int x){
+    for(int y=0;x;x=fa[y=x]){
+        splay(x);
+        if(rs) s[x].insert(lmn[rs]);
+        if(y) s[x].erase(s[x].find(lmn[y]));
+        rs=y,pushup(x);
+    }
 }
-
-inline char readop() {
-    char c;
-    while(!isop(c = fgc()));
-    return c;
+void modify(int x){
+    access(x),splay(x);
+    col[x]^=1,w[x]=col[x]?0:inf;
+    col[x]?(++white):(--white);
+    pushup(x);
 }
-
-const int MAXN = 200005, INF = 2e9;
-
-int n, q, col[MAXN], ans;
-
-struct Edge {
-    int to, w, nxt;
-} gra[MAXN << 1], grao[MAXN << 1];
-int head[MAXN], heado[MAXN], ecnt, ecnto;
-
-inline void addedge(int u, int v, int w) {
-    gra[ecnt] = Edge {v, w, head[u]}; head[u] = ecnt++;
+int query(int x){
+    access(x),splay(x);
+    return rmn[x];
 }
-
-inline void addedgeo(int u, int v, int w) {
-    grao[ecnto] = Edge {v, w, heado[u]}; heado[u] = ecnto++;
+void dfs(int u){
+    for(int i=head[u];i;i=Next[i]){
+        int v=ver[i];
+        if(v==fa[u]) continue;
+        fa[v]=u,val[v]=1,dfs(v);
+        s[u].insert(lmn[v]);
+    }
+    pushup(u);
 }
-
-inline void rebuild(int u, int fa) {
-    int ff = 0;
-    for(int i = heado[u]; ~i; i = grao[i].nxt) {
-        int v = grao[i].to, w = grao[i].w;
-        if(v == fa) continue;
-        if(!ff) {
-            addedge(u, v, w);
-            addedge(v, u, w);
-            ff = u;
-        } else {
-            int k = ++n;
-            col[k] = 1;
-            addedge(ff, k, 0);
-            addedge(k, ff, 0);
-            addedge(k, v, w);
-            addedge(v, k, w);
-            ff = k;
+int main(){
+    //freopen("testdata.in","r",stdin);
+    n=read();init();
+    for(int i=1;i<n;++i){
+        int u=read(),v=read();
+        add(u,v),add(v,u);
+    }
+    dfs(1);q=read();
+    while(q--){
+        int op=read(),x=read();
+        if(op){
+            if(!white) *o++='-',*o++='1';
+            else if(col[x]) *o++='0';
+            else print(query(x));
+            *o++='\n';
         }
-        rebuild(v, u);
+        
+        else modify(x);
     }
-}
-
-bool del[MAXN << 1];
-int ct, ctsiz, sum;
-int siz[MAXN], msz[MAXN];
-
-inline void calsiz(int u, int fa) {
-    siz[u] = 1;
-    for(int i = head[u]; ~i; i = gra[i].nxt) {
-        int v = gra[i].to;
-        if(del[i >> 1] || v == fa) continue;
-        calsiz(v, u);
-        siz[u] += siz[v];
-    }
-}
-
-inline void findct(int u, int fa) {
-    for(int i = head[u]; ~i; i = gra[i].nxt) {
-        int v = gra[i].to;
-        if(del[i >> 1] || v == fa) continue;
-        findct(v, u);
-        int vsiz = std::max(siz[v], sum - siz[v]);
-        if(vsiz < ctsiz) {
-            ct = i;
-            ctsiz = vsiz;
-        }
-    }
-}
-
-struct DisData {
-    int u, d;
-    inline bool operator<(const DisData &rhs) const {
-        return d < rhs.d;
-    }
-};
-
-std::priority_queue<DisData> s[MAXN][2];
-int cnt;
-
-struct NodeData {
-    int bel, side, dis;
-};
-std::vector<NodeData> ndata[MAXN];
-
-inline void caldis(int u, int fa, int d, int t, int l) {
-    if(!col[u]) {
-        s[t][l].push(DisData {u, d}); ndata[u].push_back(NodeData {t, l, d});
-    }
-    for(int i = head[u]; ~i; i = gra[i].nxt) {
-        int v = gra[i].to, w = gra[i].w;
-        if(del[i >> 1] || v == fa) continue;
-        caldis(v, u, d + w, t, l);
-    }
-}
-
-int mx[MAXN], lch[MAXN], rch[MAXN], ctw[MAXN];
-
-inline void update(int p) {
-    while(!s[p][0].empty() && col[s[p][0].top().u]) s[p][0].pop();
-    while(!s[p][1].empty() && col[s[p][1].top().u]) s[p][1].pop();
-    if(s[p][0].empty() || s[p][1].empty()) mx[p] = 0;
-    else mx[p] = s[p][0].top().d + ctw[p] + s[p][1].top().d;
-    if(lch[p]) mx[p] = std::max(mx[p], mx[lch[p]]);
-    if(rch[p]) mx[p] = std::max(mx[p], mx[rch[p]]);
-}
-
-inline int divide(int u) {
-    calsiz(u, 0);
-    ct = -1; ctsiz = INF; sum = siz[u]; findct(u, 0);
-    if(ct == -1) return 0;
-    int x = gra[ct].to, y = gra[ct ^ 1].to;
-    del[ct >> 1] = true;
-    int t = ++cnt;
-    ctw[t] = gra[ct].w;
-    caldis(x, 0, 0, t, 0); caldis(y, 0, 0, t, 1);
-    lch[t] = divide(x); rch[t] = divide(y); 
-    update(t);
-    return t;
-}
-
-inline void setwhite(int u) {
-    for(int i = ndata[u].size() - 1; i >= 0; i--) {
-        NodeData d = ndata[u][i];
-        s[d.bel][d.side].push(DisData {u, d.dis});
-        update(d.bel);
-    }
-}
-
-inline void setblack(int u) {
-    for(int i = ndata[u].size() - 1; i >= 0; i--) {
-        NodeData d = ndata[u][i];
-        update(d.bel);
-    }
-}
-
-int ut, vt, wt;
-char op;
-
-int main() {
-    memset(head, -1, sizeof(head));
-    memset(heado, -1, sizeof(heado));
-    n = readint();
-    int white = n;
-    for(int i = 1; i < n; i++) {
-        ut = readint(); vt = readint(); wt = readint();
-        addedgeo(ut, vt, wt);
-        addedgeo(vt, ut, wt);
-    }
-    rebuild(1, 0);
-    divide(1);
-    q = readint();
-    while(q--) {
-        op = readop();
-        if(op == 'A') {
-            if(!white) {
-                puts("They have disappeared.");
-            } else if(white == 1) {
-                puts("0");
-            } else {
-                printf("%d\n", mx[1]);
-            }
-        } else {
-            ut = readint(); 
-            col[ut] ^= 1;
-            if(col[ut]) {
-                setblack(ut);
-                white--;
-            } else {
-                setwhite(ut);
-                white++;
-            }
-        }
-    }
+    fwrite(obuf,o-obuf,1,stdout);
     return 0;
 }
