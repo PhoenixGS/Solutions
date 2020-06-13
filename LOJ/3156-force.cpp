@@ -48,15 +48,10 @@ long long calc(int pos, int idx)
 {
 	int l = head[pos];
 	int r = tail[pos];
-	if (l > r)
-	{
-		return INF;
-	}
 	while (l < r)
 	{
 		int mid = (l + r) >> 1;
 		if (T(vec[pos][mid]) - 2ll * A * Q(vec[pos][mid]) * p[idx] > T(vec[pos][mid + 1]) - 2ll * A * Q(vec[pos][mid + 1]) * p[idx])
-//		if ((double)T(vec[pos][mid]) - 2ll * A * Q(vec[pos][mid]) * p[idx] > (double)T(vec[pos][mid + 1]) - 2ll * A * Q(vec[pos][mid + 1]) * p[idx])
 		{
 			l = mid + 1;
 		}
@@ -79,8 +74,6 @@ void add(int pos, int idx)
 
 int main()
 {
-	freopen("route.in", "r", stdin);
-	freopen("route.out", "w", stdout);
 	scanf("%d%d%d%d%d", &n, &m, &A, &B, &C);
 	for (int i = 1; i <= m; i++)
 	{
@@ -107,19 +100,39 @@ int main()
 	z[last].idx = 0;
 	std::sort(z + 1, z + last + 1, comp);
 	
-	for (int i = 0; i <= n; i++)
+	for (int i = 0; i <= m; i++)
 	{
+		f[i] = INF;
 		head[i] = 1;
 		tail[i] = 0;
 		vec[i].push_back(0);
 		vec[i].push_back(0);
 	}
-	for (int i = 0; i <= m; i++)
-	{
-		f[i] = INF;
-	}
 
 	f[0] = 0;
+	for (int i = 1; i <= last; i++)
+	{
+		if (z[i].cas == 0)
+		{
+			for (int k = 1; k < i; k++)
+			{
+				if (z[k].cas == 1)
+				{
+					if (z[i].pos == z[k].pos)
+					{
+						int idx = z[i].idx;
+						int j = z[k].idx;
+						f[idx] = std::min(f[idx], f[j] + (long long)A * (p[idx] - q[j]) * (p[idx] - q[j]) + (long long)B * (p[idx] - q[j]) + C);
+						if (idx == 3476)
+						{
+							
+						}
+					}
+				}
+			}
+		}
+	}
+	/*
 	for (int i = 1; i <= last; i++)
 	{
 		if (z[i].cas == 0)
@@ -128,21 +141,24 @@ int main()
 		}
 		else
 		{
-			if (f[z[i].idx] < INF)
-			{
-				add(z[i].pos, z[i].idx);
-			}
+			add(z[i].pos, z[i].idx);
 		}
 	}
-
+*/
 	ans = INF;
 	for (int i = 1; i <= m; i++)
 	{
+//		printf("..%lld\n", f[i]);
 		if (v[i] == n)
 		{
 			ans = std::min(ans, f[i] + q[i]);
+			if (f[i] + q[i])
+			{
+				printf("...%d %lld %d\n", i, f[i], q[i]);
+			}
 		}
 	}
 	printf("%lld\n", ans);
 	return 0;
 }
+
