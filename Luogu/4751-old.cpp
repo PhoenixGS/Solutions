@@ -3,13 +3,27 @@
 
 long long read()
 {
-    char last = '+', ch = getchar();
-    while (ch < '0' || ch > '9') last = ch, ch = getchar();
-    long long tmp = 0;
-    while (ch >= '0' && ch <= '9') tmp = tmp * 10 + ch - 48, ch = getchar();
-    if (last == '-') tmp = -tmp;
-    return tmp;
+	char last = '+', ch = getchar();
+	while (ch < '0' || ch > '9') last = ch, ch = getchar();
+	long long tmp = 0;
+	while (ch >= '0' && ch <= '9') tmp = tmp * 10 + ch - 48, ch = getchar();
+	if (last == '-') tmp = -tmp;
+	return tmp;
 }
+
+const int INF = 1000000000;
+const int _n = 1000000 + 10;
+int n, m;
+int x[_n];
+int edgenum;
+int vet[2 * _n], nextx[2 * _n], head[_n];
+int size[_n], lsize[_n], deep[_n], son[_n], vis[_n];
+int last;
+int z[_n];
+int f[_n][2], g[_n][2];
+int root;
+int ch[_n][2], fa[_n];
+int lastans;
 
 struct matrix
 {
@@ -21,30 +35,16 @@ struct matrix
 	}
 };
 
-const int INF = 1000000000;
-const int _n = 1000000 + 10;
-int n, m;
-int x[_n];
-int edgenum;
-int vet[2 * _n], nextx[2 * _n], head[_n];
-int f[_n][2], g[_n][2];
-int vis[_n];
-int size[_n], son[_n], lsize[_n];
-int ch[_n][2], fa[_n];
 matrix mat[_n], mul[_n];
-int last;
-int z[_n];
-int root;
-int lastans;
 
 matrix operator * (matrix x, matrix y)
 {
-	static matrix z;
+	matrix tmp;
 	for (int i = 0; i < 2; i++)
 	{
 		for (int j = 0; j < 2; j++)
 		{
-			z[i][j] = -INF;
+			tmp[i][j] = -INF;
 		}
 	}
 	for (int i = 0; i < 2; i++)
@@ -53,11 +53,11 @@ matrix operator * (matrix x, matrix y)
 		{
 			for (int k = 0; k < 2; k++)
 			{
-				z[i][j] = std::max(z[i][j], x[i][k] + y[k][j]);
+				tmp[i][k] = std::max(tmp[i][k], x[i][j] + y[j][k]);
 			}
 		}
 	}
-	return z;
+	return tmp;
 }
 
 void add(int u, int v)
@@ -76,33 +76,41 @@ void dfs(int u, int father)
 		int v = vet[i];
 		if (v != father)
 		{
+			deep[v] = deep[u] + 1;
 			dfs(v, u);
 			size[u] += size[v];
-			if (size[v] > size[son[u]])
-			{
-				son[u] = v;
-			}
 		}
 	}
 }
 
 void dfs2(int u, int father)
 {
-	lsize[u] = size[u] - size[son[u]];
+	int k = 0;
+	for (int i = head[u]; i; i = nextx[i])
+	{
+		int v = vet[i];
+		if (v != father && size[v] > size[k])
+		{
+			k = v;
+		}
+	}
+	son[u] = k;
+	lsize[u] = size[u] - size[k];
 	f[u][0] = 0;
 	f[u][1] = x[u];
 	g[u][0] = 0;
 	g[u][1] = x[u];
-	if (son[u])
+//	printf("??%d %d\n", u, son[u]);
+	if (k != 0)
 	{
-		dfs2(son[u], u);
-		f[u][0] = f[u][0] + std::max(f[son[u]][0], f[son[u]][1]);
-		f[u][1] = f[u][1] + f[son[u]][0];
+		dfs2(k, u);
+		f[u][0] = f[u][0] + std::max(f[k][0], f[k][1]);
+		f[u][1] = f[u][1] + f[k][0];
 	}
 	for (int i = head[u]; i; i = nextx[i])
 	{
 		int v = vet[i];
-		if (v != father && v != son[u])
+		if (v != father && v != k)
 		{
 			dfs2(v, u);
 			f[u][0] = f[u][0] + std::max(f[v][0], f[v][1]);
@@ -136,8 +144,7 @@ int sbuild(int l, int r)
 	{
 		return 0;
 	}
-	int tot = 0;
-	int sum = 0;
+	int tot = 0, sum = 0;
 	for (int i = l; i <= r; i++)
 	{
 		tot += lsize[z[i]];
@@ -155,13 +162,14 @@ int sbuild(int l, int r)
 			return z[i];
 		}
 	}
+	return 0;
 }
 
 int build(int root)
 {
 	for (int u = root; u; u = son[u])
 	{
-		vis[u] = 1;
+		vis[u] = true;
 	}
 	for (int u = root; u; u = son[u])
 	{
@@ -170,8 +178,8 @@ int build(int root)
 			int v = vet[i];
 			if (! vis[v])
 			{
-				int vroot = build(v);
-				fa[vroot] = u;
+				int sroot = build(v);
+				fa[sroot] = u;
 			}
 		}
 	}
@@ -181,7 +189,8 @@ int build(int root)
 		last++;
 		z[last] = u;
 	}
-	return sbuild(1, last);
+	int rt = sbuild(1, last);
+	return rt;
 }
 
 void change(int u, int newvalue)
@@ -195,7 +204,7 @@ void change(int u, int newvalue)
 	mat[u][1][1] = -INF;
 	for (int pos = u; pos; pos = fa[pos])
 	{
-		if (ch[fa[pos]][0] != pos && ch[fa[pos]][1] != pos)
+		if (fa[pos] && ch[fa[pos]][0] != pos && ch[fa[pos]][1] != pos)
 		{
 			g[fa[pos]][0] -= std::max(mul[pos][0][0], mul[pos][1][0]);
 			g[fa[pos]][1] -= mul[pos][0][0];
@@ -216,7 +225,7 @@ void change(int u, int newvalue)
 
 int main()
 {
-	scanf("%d%d",  &n, &m);
+	scanf("%d%d", &n, &m);
 	for (int i = 1; i <= n; i++)
 	{
 		x[i] = read();
@@ -232,14 +241,17 @@ int main()
 	dfs2(1, 0);
 	root = build(1);
 	lastans = 0;
+//	printf("Z%d %d %d %d\n", f[1][0], f[1][1], mul[root][0][0], mul[root][1][0]);
 	while (m--)
 	{
-		int pos = read();
-		int newvalue = read();
-		pos = pos ^ lastans;
+		int pos, newvalue;
+		scanf("%d%d", &pos, &newvalue);
+		pos ^= lastans;
 		change(pos, newvalue);
 		lastans = std::max(mul[root][0][0], mul[root][1][0]);
 		printf("%d\n", lastans);
+//		matrix z = query_(1, 1, n, 1, dfn[down[1]]);
+//		printf("%d\n", std::max(z[0][0], z[1][0]));
 	}
 	return 0;
 }
